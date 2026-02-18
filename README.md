@@ -168,11 +168,8 @@ pnpm typecheck
 # E2E tests
 pnpm test:e2e
 
-# Linting
-pnpm lint
-
 # Run everything (what CI runs)
-pnpm lint && pnpm typecheck && pnpm test && pnpm build
+pnpm typecheck && pnpm test && pnpm build
 ```
 
 ---

@@ -19,7 +19,6 @@
 
 - [ ] Unit tests pass (`pnpm test`)
 - [ ] Type check passes (`pnpm typecheck`)
-- [ ] Lint passes (`pnpm lint`)
 - [ ] Build succeeds (`pnpm build`)
 - [ ] Manual testing done
 

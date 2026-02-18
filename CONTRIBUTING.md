@@ -51,7 +51,6 @@ test: add pattern matcher edge case coverage
 2. Make your changes
 3. Ensure all checks pass:
    ```bash
-   pnpm lint
    pnpm typecheck
    pnpm test
    pnpm build
