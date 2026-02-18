@@ -1,7 +1,7 @@
 {
   "name": "scout-agent-capture",
   "version": "1.0.0",
-  "description": "Autonomous Twitter/X discourse capture agent for ScoutAgent venture intelligence",
+  "description": "Autonomous Twitter/X capture agent — tracks what developers are building and shipping for ScoutAgent venture intelligence",
   "schedule": "0 */4 * * *",
   "browser": {
     "type": "managed",

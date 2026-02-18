@@ -6,7 +6,7 @@ export default function DashboardPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Alpha Feed</h1>
         <p className="text-text-muted text-sm mt-1">
-          Real-time venture intelligence from developer discourse
+          What developers are building that&apos;s getting traction right now
         </p>
       </div>
       <AlphaFeed />

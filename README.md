@@ -5,43 +5,96 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D10-orange)](https://pnpm.io/)
 
-**Venture intelligence platform** — transforms developer discourse into structured market opportunities via a 3-layer AI refinery pipeline.
+**Your AI venture analyst.** ScoutAgent reads thousands of developer conversations so you don't have to — and tells you exactly what to build next.
 
-ScoutAgent monitors developer conversations, extracts emerging signals, clusters them into patterns, and synthesizes actionable **Alpha Cards** that highlight what to build next.
+---
+
+## The Problem
+
+Every day, developers publicly share what they built that got users, what side projects are making money, and what tools are blowing up. These signals reveal exactly where real demand exists — but they're scattered across the internet, buried in noise, and gone within hours.
+
+By the time you spot the pattern, someone else already shipped it.
+
+## What ScoutAgent Does
+
+ScoutAgent monitors developer conversations, filters out the noise, and spots when multiple builders are finding traction in the same space. It delivers **Alpha Cards** — actionable opportunity briefs that tell you where real demand is emerging and how to act on it within a 72-hour window.
+
+Think of it as an always-on venture analyst that watches what developers are actually building and shipping, not what surveys predict.
+
+---
+
+## See It In Action
+
+Here's an example Alpha Card that ScoutAgent generates:
+
+> **K8s Exodus: Simplification Wave Creates Deploy-Tool Opportunity**
+>
+> **Momentum:** 72/100 (Rising)&ensp;&ensp;**Category:** Friction Opportunity&ensp;&ensp;**Signals:** 5
+>
+> **What's happening:** Multiple developers are shipping simpler deployment tools and getting massive traction — K8s-to-Compose converters gaining thousands of stars, deploy CLIs hitting $5k MRR, one-click migration tools signing up hundreds of users in week one.
+>
+> **The opportunity:** The deployment simplification space is heating up but no dominant player has emerged. Mid-size teams (10-50 engineers) who adopted K8s prematurely are actively looking for alternatives.
+>
+> **Blueprint:** A CLI tool that auto-converts Kubernetes YAML manifests into Docker Compose + Kamal configurations — scan, generate, migrate in one command.
+>
+> **Window:** 6-12 months before the market consolidates.
+
+Each card comes with evidence trails, risk factors, a week-by-week MVP plan, and monetization suggestions.
 
 ---
 
 ## How It Works
 
-Raw developer discourse flows through a three-layer refinery:
-
 ```
-  Ingest Webhook          L1 Scrubber           L2 Pattern Matcher       L3 Strategist
- ┌─────────────┐    ┌──────────────────┐    ┌──────────────────────┐    ┌─────────────────┐
- │  Raw Capture │───▶│  Signal Extraction│───▶│  Pattern Clustering  │───▶│  Alpha Card     │
- │  (HMAC auth) │    │  (Claude Haiku)   │    │  (Heuristics)        │    │  (Claude Sonnet) │
- └─────────────┘    └──────────────────┘    └──────────────────────┘    └─────────────────┘
+  What developers are saying       ScoutAgent Pipeline              You get
+ ┌──────────────────────────┐                                  ┌──────────────────┐
+ │ "Built a K8s-to-Compose  │     ┌─────────┐  ┌─────────┐    │  Alpha Card:     │
+ │  tool, 2K stars in 3d"   │────▶│ Extract │─▶│ Cluster │──┐ │  "K8s Exodus"    │
+ │                           │     │ signals │  │ patterns│  │ │                  │
+ │ "My deploy CLI just hit  │     └─────────┘  └─────────┘  │ │  + what's hot    │
+ │  $5k MRR — teams hate    │────▶  AI reads     spots the  │ │  + opportunity   │
+ │  managing K8s"            │      each post    trend       │ │  + blueprint     │
+ │                           │                               │ │  + evidence      │
+ │ "Launched a migration     │                  ┌─────────┐  │ │  + risk factors  │
+ │  helper, 500 signups in   │────▶             │Strategize│◀┘ │  + MVP plan      │
+ │  the first week"          │                  │  & write │───▶│  + window        │
+ └──────────────────────────┘                   └─────────┘    └──────────────────┘
 ```
 
-| Layer | Name | Model | What It Does |
-|-------|------|-------|-------------|
-| L1 | **Scrubber** | Claude Haiku | Extracts structured signals from raw developer posts |
-| L2 | **Pattern Matcher** | Heuristics | Clusters related signals into emerging patterns |
-| L3 | **Strategist** | Claude Sonnet | Synthesizes patterns into actionable Alpha Cards |
+**Three steps, each with a specific job:**
 
-The pipeline persists state after each layer — partial success is by design.
+| Step | What happens | How |
+|------|-------------|-----|
+| **1. Extract** | Reads posts, identifies who built what and how it's performing | AI (Claude Haiku) |
+| **2. Cluster** | Spots when multiple builders are finding traction in the same space | Heuristics |
+| **3. Strategize** | Synthesizes the pattern into an Alpha Card with thesis, opportunity, and blueprint | AI (Claude Sonnet) |
+
+The pipeline saves progress after each step — if one step fails, the work from previous steps isn't lost.
+
+<details>
+<summary><strong>Architecture details (for contributors)</strong></summary>
+
+The system is a **three-layer refinery pipeline**:
+
+- **L1 Scrubber** — Batch-processes raw captures through Claude Haiku for structured signal extraction
+- **L2 Pattern Matcher** — Spots when multiple builders are finding traction in the same space via entity overlap and momentum scoring
+- **L3 Strategist** — Feeds qualifying clusters to Claude Sonnet to generate full Alpha Cards with blueprints
+
+Data flows through an HMAC-SHA256 authenticated webhook, persists to Supabase after each layer, and Alpha Cards expire after 72 hours. See [CONTRIBUTING.md](./CONTRIBUTING.md) for architecture gotchas.
+
+</details>
 
 ---
 
 ## Features
 
-- **Signal Detection** — AI-powered extraction of market signals from developer conversations
-- **Pattern Clustering** — Automatic grouping of related signals into trends
-- **Alpha Cards** — Actionable opportunity cards with 72-hour TTL
-- **Blueprints** — Startup-in-a-box plans attached to each Alpha (roadmapped)
-- **Tier Gating** — Free / Pro access with server-side field nullification
-- **Webhook Ingest** — HMAC-SHA256 + timestamp + nonce verified data ingestion
-- **Stripe Billing** — Pro plan subscription at $19/mo
+- **Signal Detection** — AI reads developer posts and extracts who built what and how it performed
+- **Pattern Recognition** — Spots when multiple builders are finding traction in the same space
+- **Alpha Cards** — Actionable opportunity briefs, refreshed every 72 hours
+- **MVP Blueprints** — Each card includes a product concept, week-by-week build plan, and monetization model
+- **Free & Pro Tiers** — Core access is free; Pro unlocks full strategy, blueprints, and evidence trails
+- **Secure Ingest** — Webhook data pipeline with cryptographic verification
+- **Stripe Billing** — Pro plan at $19/mo with full subscription management
 
 ---
 

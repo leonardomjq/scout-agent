@@ -2,7 +2,7 @@
   "name": "scout-agent",
   "version": "1.0.0",
   "private": true,
-  "description": "Venture intelligence platform — transforms developer discourse into structured market opportunities via a 3-layer AI refinery pipeline",
+  "description": "Venture intelligence platform — monitors what developers are building and shipping, spots where traction is clustering, and delivers actionable opportunity briefs",
   "license": "MIT",
   "repository": {
     "type": "git",

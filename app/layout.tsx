@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ScoutAgent — Venture Intelligence",
   description:
-    "Transform raw X/Twitter discourse into structured market opportunities. Identify technical shifts and dev-friction points before they reach the mainstream.",
+    "Your AI venture analyst. ScoutAgent tracks what developers are building and shipping, spots where traction is clustering, and delivers actionable opportunity briefs.",
 };
 
 export default function RootLayout({

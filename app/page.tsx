@@ -36,9 +36,9 @@ export default function LandingPage() {
             <span className="text-accent-green">Before the Mainstream</span>
           </h1>
           <p className="text-xl text-text-muted max-w-2xl mx-auto">
-            ScoutAgent transforms raw developer discourse into structured market
-            opportunities. Identify technical shifts and friction points that
-            signal the next big thing.
+            ScoutAgent tracks what developers are building and shipping, spots
+            where traction is clustering, and tells you exactly what to build
+            next.
           </p>
           <div className="flex items-center justify-center gap-4 pt-4">
             <Link
@@ -62,16 +62,16 @@ export default function LandingPage() {
             <div className="text-accent-green text-2xl mb-3">01</div>
             <h3 className="font-semibold text-lg mb-2">Signal Detection</h3>
             <p className="text-text-muted text-sm">
-              Autonomous agents scan developer discourse 24/7, extracting
-              technical signals from noise.
+              Monitors what developers are building, launching, and growing
+              — 24/7, across thousands of conversations.
             </p>
           </div>
           <div className="bg-surface border border-border rounded-xl p-6 text-left">
             <div className="text-accent-amber text-2xl mb-3">02</div>
             <h3 className="font-semibold text-lg mb-2">Pattern Matching</h3>
             <p className="text-text-muted text-sm">
-              AI-powered clustering identifies co-occurring technologies and
-              momentum shifts in real-time.
+              Spots when multiple builders are finding traction in the same
+              space — validated demand, not guesswork.
             </p>
           </div>
           <div className="bg-surface border border-border rounded-xl p-6 text-left">
