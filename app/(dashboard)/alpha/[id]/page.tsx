@@ -7,6 +7,7 @@ import { BlurGate } from "@/components/blur-gate";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { InlineUpgradeHint } from "@/components/inline-upgrade-hint";
+import { ProFieldTeaser } from "@/components/pro-field-teaser";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
@@ -150,7 +151,7 @@ export default async function AlphaDetailPage({ params }: Props) {
           <section>
             <h2 className="text-lg font-semibold mb-3">Friction Detail</h2>
             {isLocked ? (
-              <InlineUpgradeHint />
+              <ProFieldTeaser field="friction_detail" />
             ) : card.friction_detail ? (
               <p className="text-text-muted leading-relaxed">
                 {card.friction_detail}
@@ -161,7 +162,7 @@ export default async function AlphaDetailPage({ params }: Props) {
           <section>
             <h2 className="text-lg font-semibold mb-3">Gap Analysis</h2>
             {isLocked ? (
-              <InlineUpgradeHint />
+              <ProFieldTeaser field="gap_analysis" />
             ) : card.gap_analysis ? (
               <p className="text-text-muted leading-relaxed">
                 {card.gap_analysis}
@@ -172,7 +173,7 @@ export default async function AlphaDetailPage({ params }: Props) {
           <section>
             <h2 className="text-lg font-semibold mb-3">Timing Signal</h2>
             {isLocked ? (
-              <InlineUpgradeHint />
+              <ProFieldTeaser field="timing_signal" />
             ) : card.timing_signal ? (
               <p className="text-text-muted leading-relaxed">
                 {card.timing_signal}
@@ -183,7 +184,7 @@ export default async function AlphaDetailPage({ params }: Props) {
           <section>
             <h2 className="text-lg font-semibold mb-3">Competitive Landscape</h2>
             {isLocked ? (
-              <InlineUpgradeHint />
+              <ProFieldTeaser field="competitive_landscape" />
             ) : card.competitive_landscape ? (
               <p className="text-text-muted leading-relaxed">
                 {card.competitive_landscape}
@@ -194,7 +195,7 @@ export default async function AlphaDetailPage({ params }: Props) {
           <section>
             <h2 className="text-lg font-semibold mb-3">Risk Factors</h2>
             {isLocked ? (
-              <InlineUpgradeHint />
+              <ProFieldTeaser field="risk_factors" />
             ) : card.risk_factors ? (
               <ul className="list-disc list-inside text-text-muted space-y-1">
                 {card.risk_factors.map((risk, i) => (
@@ -204,14 +205,16 @@ export default async function AlphaDetailPage({ params }: Props) {
             ) : null}
           </section>
 
-          {card.opportunity_type && !isLocked && (
-            <section>
-              <h2 className="text-lg font-semibold mb-3">Opportunity Type</h2>
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Opportunity Type</h2>
+            {isLocked ? (
+              <ProFieldTeaser field="opportunity_type" />
+            ) : card.opportunity_type ? (
               <Badge variant="success" shape="tag" className="text-sm px-3 py-1">
                 {card.opportunity_type.replace("_", " ")}
               </Badge>
-            </section>
-          )}
+            ) : null}
+          </section>
         </div>
       </div>
     </div>

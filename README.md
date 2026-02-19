@@ -94,7 +94,7 @@ Data flows through an HMAC-SHA256 authenticated webhook, persists to Appwrite af
 - **MVP Blueprints** — Each card includes a product concept, week-by-week build plan, and monetization model
 - **Free & Pro Tiers** — Core access is free; Pro unlocks full strategy, blueprints, and evidence trails
 - **Secure Ingest** — Webhook data pipeline with cryptographic verification
-- **Stripe Billing** — Pro plan at $19/mo with full subscription management
+- **Stripe Billing** — Pro plan with monthly ($29/mo) and annual ($24/mo) billing
 
 ---
 
@@ -169,7 +169,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | `STRIPE_SECRET_KEY` | Yes | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Yes | Stripe webhook signing secret |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Stripe publishable key |
-| `STRIPE_PRO_PRICE_ID` | Yes | Stripe price ID for Pro plan |
+| `STRIPE_PRO_PRICE_ID_MONTHLY` | Yes | Stripe price ID for Pro monthly plan ($29/mo) |
+| `STRIPE_PRO_PRICE_ID_ANNUAL` | Yes | Stripe price ID for Pro annual plan ($24/mo billed at $288/yr) |
 | `INGEST_HMAC_SECRET` | Yes | HMAC-SHA256 secret for webhook verification |
 | `PIPELINE_BEARER_TOKEN` | Yes | Bearer token for pipeline trigger |
 | `NEXT_PUBLIC_APP_URL` | Yes | Application URL (e.g. `http://localhost:3000`) |

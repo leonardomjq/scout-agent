@@ -11,9 +11,11 @@ const proFeatures = [
   { label: "Alpha Card titles & categories", free: true },
   { label: "Momentum scores & direction", free: true },
   { label: "Entity tags", free: true },
+  { label: "2 evidence items per card", free: true },
   { label: "Full thesis & strategy", free: false },
-  { label: "Risk factors & evidence", free: false },
-  { label: "Build This blueprints", free: false },
+  { label: "Full evidence trail", free: false },
+  { label: "Opportunity playbooks", free: false },
+  { label: "Competitive landscape & risk factors", free: false },
   { label: "Friction details & opportunity windows", free: false },
 ];
 
@@ -40,6 +42,10 @@ export default async function SettingsPage() {
   );
 
   const subscription = subscriptions.documents[0] ?? null;
+  const planInterval =
+    subscription?.stripe_price_id === process.env.STRIPE_PRO_PRICE_ID_ANNUAL
+      ? "Annual"
+      : "Monthly";
 
   const tier = (profile.tier as string) ?? "free";
   const initial = (user.email?.[0] ?? "?").toUpperCase();
@@ -95,6 +101,12 @@ export default async function SettingsPage() {
         {subscription ? (
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
+              <span className="text-text-muted">Plan</span>
+              <span className="text-accent-green font-semibold">
+                Pro ({planInterval})
+              </span>
+            </div>
+            <div className="flex justify-between">
               <span className="text-text-muted">Status</span>
               <span className="text-accent-green">{subscription.status}</span>
             </div>
@@ -130,7 +142,7 @@ export default async function SettingsPage() {
             What you get with Pro
           </h2>
           <p className="text-text-muted text-sm mb-4">
-            $19/mo — cancel anytime
+            Starting at $24/mo — cancel anytime
           </p>
           <ul className="space-y-2.5">
             {proFeatures.map((f) => (

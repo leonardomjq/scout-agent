@@ -1,15 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getLoggedInUser } from "@/lib/appwrite/server";
 import { getStripe } from "@/lib/stripe/client";
 import { createOrGetCustomer } from "@/lib/stripe/helpers";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const user = await getLoggedInUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const interval = request.nextUrl.searchParams.get("interval");
+    const priceId =
+      interval === "annual"
+        ? (process.env.STRIPE_PRO_PRICE_ID_ANNUAL ??
+          process.env.STRIPE_PRO_PRICE_ID!)
+        : (process.env.STRIPE_PRO_PRICE_ID_MONTHLY ??
+          process.env.STRIPE_PRO_PRICE_ID!);
 
     const customerId = await createOrGetCustomer(user.$id, user.email);
     const stripe = getStripe();
@@ -19,7 +27,7 @@ export async function POST() {
       mode: "subscription",
       line_items: [
         {
-          price: process.env.STRIPE_PRO_PRICE_ID!,
+          price: priceId,
           quantity: 1,
         },
       ],
