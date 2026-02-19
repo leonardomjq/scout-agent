@@ -1,20 +1,36 @@
 import type { AlphaCard, AlphaTier } from "@/types";
 
 const PRO_FIELDS = [
-  "thesis",
-  "strategy",
-  "risk_factors",
-  "evidence",
   "friction_detail",
-  "opportunity_window",
-  "blueprint",
+  "gap_analysis",
+  "timing_signal",
+  "risk_factors",
+  "competitive_landscape",
+  "opportunity_type",
 ] as const;
 
+/**
+ * Gate an Alpha Card based on user tier.
+ *
+ * Free tier sees: title, category, entities, signal_strength, direction,
+ * signal_count, thesis, and truncated evidence (first 2 items).
+ *
+ * Pro tier sees everything.
+ */
 export function gateAlphaCard(card: AlphaCard, tier: AlphaTier): AlphaCard {
   if (tier === "pro") return card;
+
   const gated = { ...card };
+
+  // Nullify pro-only text fields
   for (const field of PRO_FIELDS) {
-    gated[field] = null;
+    (gated as Record<string, unknown>)[field] = null;
   }
+
+  // Truncate evidence to 2 items for free tier (enough to validate the signal)
+  if (gated.evidence) {
+    gated.evidence = gated.evidence.slice(0, 2);
+  }
+
   return gated;
 }

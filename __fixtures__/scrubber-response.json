@@ -1,15 +1,15 @@
 {
   "entities": [
-    { "name": "Turbopack", "category": "tool", "sentiment": "positive", "friction_signal": true, "mentions": 2 },
-    { "name": "Webpack", "category": "tool", "sentiment": "negative", "friction_signal": false, "mentions": 1 },
-    { "name": "Rust", "category": "language", "sentiment": "positive", "friction_signal": false, "mentions": 2 },
-    { "name": "esbuild", "category": "tool", "sentiment": "neutral", "friction_signal": false, "mentions": 1 },
-    { "name": "Svelte", "category": "framework", "sentiment": "positive", "friction_signal": true, "mentions": 2 },
-    { "name": "React", "category": "framework", "sentiment": "negative", "friction_signal": false, "mentions": 1 },
-    { "name": "Kubernetes", "category": "platform", "sentiment": "negative", "friction_signal": true, "mentions": 1 },
-    { "name": "Docker", "category": "tool", "sentiment": "positive", "friction_signal": false, "mentions": 1 },
-    { "name": "Kamal", "category": "tool", "sentiment": "positive", "friction_signal": false, "mentions": 1 },
-    { "name": "TypeScript", "category": "language", "sentiment": "positive", "friction_signal": false, "mentions": 2 }
+    { "name": "Turbopack", "category": "tool", "sentiment": "positive", "mention_context": "migration", "friction_signal": true, "mentions": 2 },
+    { "name": "Webpack", "category": "tool", "sentiment": "negative", "mention_context": "comparison", "friction_signal": false, "mentions": 1 },
+    { "name": "Rust", "category": "language", "sentiment": "positive", "mention_context": "praise", "friction_signal": false, "mentions": 2 },
+    { "name": "esbuild", "category": "tool", "sentiment": "neutral", "mention_context": "comparison", "friction_signal": false, "mentions": 1 },
+    { "name": "Svelte", "category": "framework", "sentiment": "positive", "mention_context": "migration", "friction_signal": true, "mentions": 2 },
+    { "name": "React", "category": "framework", "sentiment": "negative", "mention_context": "complaint", "friction_signal": false, "mentions": 1 },
+    { "name": "Kubernetes", "category": "platform", "sentiment": "negative", "mention_context": "complaint", "friction_signal": true, "mentions": 1 },
+    { "name": "Docker", "category": "tool", "sentiment": "positive", "mention_context": "praise", "friction_signal": false, "mentions": 1 },
+    { "name": "Kamal", "category": "tool", "sentiment": "positive", "mention_context": "announcement", "friction_signal": false, "mentions": 1 },
+    { "name": "TypeScript", "category": "language", "sentiment": "positive", "mention_context": "praise", "friction_signal": false, "mentions": 2 }
   ],
   "friction_points": [
     {

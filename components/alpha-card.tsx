@@ -13,17 +13,24 @@ interface AlphaCardProps {
 }
 
 const categoryLabels: Record<string, string> = {
-  momentum_shift: "Momentum Shift",
-  friction_opportunity: "Friction Opportunity",
-  emerging_tool: "Emerging Tool",
-  contrarian_signal: "Contrarian Signal",
+  velocity_spike: "Velocity Spike",
+  sentiment_flip: "Sentiment Flip",
+  friction_cluster: "Friction Cluster",
+  new_emergence: "New Emergence",
 };
 
 const categoryColors: Record<string, string> = {
-  momentum_shift: "text-accent-blue",
-  friction_opportunity: "text-accent-amber",
-  emerging_tool: "text-accent-green",
-  contrarian_signal: "text-accent-red",
+  velocity_spike: "text-accent-blue",
+  sentiment_flip: "text-accent-amber",
+  friction_cluster: "text-accent-red",
+  new_emergence: "text-accent-green",
+};
+
+const statusColors: Record<string, string> = {
+  fresh: "text-accent-green",
+  warm: "text-accent-amber",
+  cold: "text-text-muted",
+  archived: "text-border",
 };
 
 export function AlphaCard({ card }: AlphaCardProps) {
@@ -46,7 +53,7 @@ export function AlphaCard({ card }: AlphaCardProps) {
               {categoryLabels[card.category] ?? card.category}
             </span>
             <MomentumBadge
-              score={card.momentum_score}
+              score={card.signal_strength}
               direction={card.direction}
             />
           </div>
@@ -65,7 +72,7 @@ export function AlphaCard({ card }: AlphaCardProps) {
             ))}
           </div>
 
-          {/* Thesis preview (pro only) */}
+          {/* Thesis (now free tier) */}
           {card.thesis && (
             <p className="text-text-muted text-sm line-clamp-2 mb-3">
               {card.thesis}
@@ -74,21 +81,13 @@ export function AlphaCard({ card }: AlphaCardProps) {
 
           {/* Footer */}
           <div className="flex items-center justify-between text-xs text-text-muted">
-            <div className="flex items-center gap-2">
-              <span>{card.signal_count} signals</span>
-              {card.blueprint && (
-                <Badge variant="success" shape="tag">
-                  // build this
-                </Badge>
-              )}
-            </div>
-            <span>
-              Expires{" "}
-              {new Date(card.expires_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
+            <span>{card.signal_count} signals</span>
+            <Badge
+              variant={card.status === "fresh" ? "success" : "default"}
+              shape="tag"
+            >
+              {card.status}
+            </Badge>
           </div>
         </Card>
       </Link>

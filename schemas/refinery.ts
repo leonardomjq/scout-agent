@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const MentionContextSchema = z.enum([
+  "announcement",
+  "complaint",
+  "migration",
+  "comparison",
+  "praise",
+  "question",
+]);
+
 export const TechEntitySchema = z.object({
   name: z.string(),
   category: z.enum([
@@ -11,6 +20,7 @@ export const TechEntitySchema = z.object({
     "concept",
   ]),
   sentiment: z.enum(["positive", "negative", "neutral"]),
+  mention_context: MentionContextSchema,
   friction_signal: z.boolean(),
   mentions: z.number().int().nonnegative(),
 });
@@ -36,16 +46,4 @@ export const ScrubberOutputSchema = z.object({
       extracted_insight: z.string(),
     })
   ),
-});
-
-export const PatternClusterSchema = z.object({
-  cluster_id: z.string().uuid(),
-  entities: z.array(z.string()),
-  momentum_score: z.number().min(0).max(100),
-  momentum_delta: z.number(),
-  direction: z.enum(["rising", "falling", "stable"]),
-  evidence_tweet_ids: z.array(z.string()),
-  friction_density: z.number().min(0).max(1),
-  first_seen: z.string().datetime(),
-  window_hours: z.number(),
 });

@@ -17,7 +17,7 @@
     "ai-pipeline",
     "market-signals",
     "nextjs",
-    "supabase",
+    "appwrite",
     "anthropic"
   ],
   "engines": {
@@ -36,8 +36,7 @@
   "packageManager": "pnpm@10.28.0",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.76.0",
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.97.0",
+    "node-appwrite": "^16.0.0",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",

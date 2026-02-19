@@ -3,19 +3,36 @@ import {
   TechEntitySchema,
   FrictionPointSchema,
   ScrubberOutputSchema,
-  PatternClusterSchema,
 } from "./refinery";
+import { SignalSchema } from "./signal";
 
 describe("TechEntitySchema", () => {
-  it("validates a correct entity", () => {
+  it("validates a correct entity with mention_context", () => {
     const entity = {
       name: "React",
       category: "framework",
       sentiment: "positive",
+      mention_context: "praise",
       friction_signal: false,
       mentions: 5,
     };
     expect(() => TechEntitySchema.parse(entity)).not.toThrow();
+  });
+
+  it("validates all mention_context values", () => {
+    const contexts = ["announcement", "complaint", "migration", "comparison", "praise", "question"];
+    for (const mention_context of contexts) {
+      expect(() =>
+        TechEntitySchema.parse({
+          name: "React",
+          category: "framework",
+          sentiment: "positive",
+          mention_context,
+          friction_signal: false,
+          mentions: 5,
+        })
+      ).not.toThrow();
+    }
   });
 
   it("rejects invalid category", () => {
@@ -23,6 +40,7 @@ describe("TechEntitySchema", () => {
       name: "React",
       category: "invalid_category",
       sentiment: "positive",
+      mention_context: "praise",
       friction_signal: false,
       mentions: 5,
     };
@@ -34,8 +52,20 @@ describe("TechEntitySchema", () => {
       name: "React",
       category: "framework",
       sentiment: "positive",
+      mention_context: "praise",
       friction_signal: false,
       mentions: -1,
+    };
+    expect(() => TechEntitySchema.parse(bad)).toThrow();
+  });
+
+  it("rejects missing mention_context", () => {
+    const bad = {
+      name: "React",
+      category: "framework",
+      sentiment: "positive",
+      friction_signal: false,
+      mentions: 5,
     };
     expect(() => TechEntitySchema.parse(bad)).toThrow();
   });
@@ -71,7 +101,7 @@ describe("ScrubberOutputSchema", () => {
       total_input: 6,
       total_passed: 5,
       entities: [
-        { name: "React", category: "framework", sentiment: "positive", friction_signal: false, mentions: 3 },
+        { name: "React", category: "framework", sentiment: "positive", mention_context: "praise", friction_signal: false, mentions: 3 },
       ],
       friction_points: [],
       notable_tweets: [
@@ -97,64 +127,76 @@ describe("ScrubberOutputSchema", () => {
   });
 });
 
-describe("PatternClusterSchema", () => {
-  it("validates a correct cluster", () => {
-    const cluster = {
-      cluster_id: "550e8400-e29b-41d4-a716-446655440000",
+describe("SignalSchema", () => {
+  it("validates a correct signal", () => {
+    const signal = {
+      signal_id: "550e8400-e29b-41d4-a716-446655440000",
+      type: "velocity_spike",
       entities: ["react", "svelte"],
-      momentum_score: 65,
-      momentum_delta: 12.5,
-      direction: "rising",
+      signal_strength: 0.65,
+      friction_theme: "migration complexity",
+      mention_velocity: 3.2,
+      sentiment_delta: -0.25,
+      friction_spike: 0.15,
+      direction: "accelerating",
       evidence_tweet_ids: ["t1", "t2", "t3"],
-      friction_density: 0.5,
-      first_seen: "2025-01-15T12:00:00Z",
+      first_detected: "2025-01-15T12:00:00Z",
       window_hours: 48,
     };
-    expect(() => PatternClusterSchema.parse(cluster)).not.toThrow();
+    expect(() => SignalSchema.parse(signal)).not.toThrow();
   });
 
-  it("rejects momentum_score above 100", () => {
+  it("rejects signal_strength above 1", () => {
     const bad = {
-      cluster_id: "550e8400-e29b-41d4-a716-446655440000",
+      signal_id: "550e8400-e29b-41d4-a716-446655440000",
+      type: "velocity_spike",
       entities: ["react"],
-      momentum_score: 101,
-      momentum_delta: 0,
-      direction: "stable",
+      signal_strength: 1.1,
+      friction_theme: null,
+      mention_velocity: 2.0,
+      sentiment_delta: 0,
+      friction_spike: 0,
+      direction: "new",
       evidence_tweet_ids: [],
-      friction_density: 0,
-      first_seen: "2025-01-15T12:00:00Z",
+      first_detected: "2025-01-15T12:00:00Z",
       window_hours: 48,
     };
-    expect(() => PatternClusterSchema.parse(bad)).toThrow();
+    expect(() => SignalSchema.parse(bad)).toThrow();
   });
 
-  it("rejects friction_density above 1", () => {
+  it("rejects invalid signal type", () => {
     const bad = {
-      cluster_id: "550e8400-e29b-41d4-a716-446655440000",
+      signal_id: "550e8400-e29b-41d4-a716-446655440000",
+      type: "momentum_shift",
       entities: ["react"],
-      momentum_score: 50,
-      momentum_delta: 0,
-      direction: "stable",
+      signal_strength: 0.5,
+      friction_theme: null,
+      mention_velocity: 2.0,
+      sentiment_delta: 0,
+      friction_spike: 0,
+      direction: "new",
       evidence_tweet_ids: [],
-      friction_density: 1.5,
-      first_seen: "2025-01-15T12:00:00Z",
+      first_detected: "2025-01-15T12:00:00Z",
       window_hours: 48,
     };
-    expect(() => PatternClusterSchema.parse(bad)).toThrow();
+    expect(() => SignalSchema.parse(bad)).toThrow();
   });
 
   it("rejects invalid direction", () => {
     const bad = {
-      cluster_id: "550e8400-e29b-41d4-a716-446655440000",
+      signal_id: "550e8400-e29b-41d4-a716-446655440000",
+      type: "velocity_spike",
       entities: ["react"],
-      momentum_score: 50,
-      momentum_delta: 0,
-      direction: "sideways",
+      signal_strength: 0.5,
+      friction_theme: null,
+      mention_velocity: 2.0,
+      sentiment_delta: 0,
+      friction_spike: 0,
+      direction: "rising",
       evidence_tweet_ids: [],
-      friction_density: 0.5,
-      first_seen: "2025-01-15T12:00:00Z",
+      first_detected: "2025-01-15T12:00:00Z",
       window_hours: 48,
     };
-    expect(() => PatternClusterSchema.parse(bad)).toThrow();
+    expect(() => SignalSchema.parse(bad)).toThrow();
   });
 });

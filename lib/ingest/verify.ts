@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { ID, Query } from "node-appwrite";
+import { createAdminClient } from "@/lib/appwrite/admin";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
 
 const MAX_TIMESTAMP_AGE_MS = 5 * 60 * 1000; // 5 minutes
 const MIN_INGEST_INTERVAL_MS = 60 * 1000; // 60 seconds
@@ -36,33 +38,41 @@ export function verifyTimestamp(timestampMs: number): boolean {
 }
 
 export async function verifyNonce(nonce: string): Promise<boolean> {
-  const supabase = createAdminClient();
+  const { databases } = createAdminClient();
 
-  // Try to insert — if it already exists, it's a replay
-  const { error } = await supabase.from("ingest_nonces").insert({ nonce });
-
-  if (error) {
-    // Unique constraint violation = duplicate nonce
-    if (error.code === "23505") return false;
-    throw new Error(`Nonce check failed: ${error.message}`);
+  try {
+    // Try to insert — if unique index rejects it, it's a replay
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.INGEST_NONCES,
+      ID.unique(),
+      { nonce }
+    );
+    return true;
+  } catch (err: unknown) {
+    const e = err as { code?: number };
+    // 409 = duplicate unique index = nonce already used
+    if (e.code === 409) return false;
+    throw new Error(`Nonce check failed: ${e}`);
   }
-
-  return true;
 }
 
 export async function verifyRateLimit(sourceFeed: string): Promise<boolean> {
-  const supabase = createAdminClient();
+  const { databases } = createAdminClient();
 
-  const { data } = await supabase
-    .from("raw_captures")
-    .select("created_at")
-    .eq("source_feed", sourceFeed)
-    .order("created_at", { ascending: false })
-    .limit(1);
+  const result = await databases.listDocuments(
+    DATABASE_ID,
+    COLLECTIONS.RAW_CAPTURES,
+    [
+      Query.equal("source_feed", [sourceFeed]),
+      Query.orderDesc("$createdAt"),
+      Query.limit(1),
+    ]
+  );
 
-  if (!data || data.length === 0) return true;
+  if (result.total === 0) return true;
 
-  const lastIngest = new Date(data[0].created_at).getTime();
+  const lastIngest = new Date(result.documents[0].$createdAt).getTime();
   return Date.now() - lastIngest >= MIN_INGEST_INTERVAL_MS;
 }
 

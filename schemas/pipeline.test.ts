@@ -16,6 +16,15 @@ describe("LayerResultSchema", () => {
     expect(() => LayerResultSchema.parse(result)).not.toThrow();
   });
 
+  it("accepts delta_engine layer name", () => {
+    const result = {
+      success: [],
+      failed: [],
+      errors: [{ message: "error", layer: "delta_engine" }],
+    };
+    expect(() => LayerResultSchema.parse(result)).not.toThrow();
+  });
+
   it("rejects invalid layer name", () => {
     const result = {
       success: [],
@@ -35,8 +44,8 @@ describe("PipelineRunSchema", () => {
       status: "completed",
       captures_processed: 5,
       l1_stats: { input: 100, passed: 80, failed: 2 },
-      l2_stats: { clusters_found: 10, clusters_qualifying: 3 },
-      l3_stats: { briefs_generated: 3, failed: 0 },
+      l2_stats: { signals_found: 10, signals_qualifying: 3, baselines_updated: 8 },
+      l3_stats: { cards_generated: 3, cards_updated: 1, failed: 0 },
       total_tokens_used: 15000,
       errors: [],
     };
@@ -51,8 +60,8 @@ describe("PipelineRunSchema", () => {
       status: "running",
       captures_processed: 0,
       l1_stats: { input: 0, passed: 0, failed: 0 },
-      l2_stats: { clusters_found: 0, clusters_qualifying: 0 },
-      l3_stats: { briefs_generated: 0, failed: 0 },
+      l2_stats: { signals_found: 0, signals_qualifying: 0, baselines_updated: 0 },
+      l3_stats: { cards_generated: 0, cards_updated: 0, failed: 0 },
       total_tokens_used: 0,
       errors: [],
     };
@@ -67,8 +76,8 @@ describe("PipelineRunSchema", () => {
       status: "paused",
       captures_processed: 0,
       l1_stats: { input: 0, passed: 0, failed: 0 },
-      l2_stats: { clusters_found: 0, clusters_qualifying: 0 },
-      l3_stats: { briefs_generated: 0, failed: 0 },
+      l2_stats: { signals_found: 0, signals_qualifying: 0, baselines_updated: 0 },
+      l3_stats: { cards_generated: 0, cards_updated: 0, failed: 0 },
       total_tokens_used: 0,
       errors: [],
     };

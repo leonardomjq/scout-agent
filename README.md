@@ -80,7 +80,7 @@ The system is a **three-layer refinery pipeline**:
 - **L2 Pattern Matcher** — Spots when multiple builders are finding traction in the same space via entity overlap and momentum scoring
 - **L3 Strategist** — Feeds qualifying clusters to Claude Sonnet to generate full Alpha Cards with blueprints
 
-Data flows through an HMAC-SHA256 authenticated webhook, persists to Supabase after each layer, and Alpha Cards expire after 72 hours. See [CONTRIBUTING.md](./CONTRIBUTING.md) for architecture gotchas.
+Data flows through an HMAC-SHA256 authenticated webhook, persists to Appwrite after each layer, and Alpha Cards expire after 72 hours. See [CONTRIBUTING.md](./CONTRIBUTING.md) for architecture gotchas.
 
 </details>
 
@@ -105,7 +105,7 @@ Data flows through an HMAC-SHA256 authenticated webhook, persists to Supabase af
 | Framework | Next.js 16 (App Router, Turbopack) |
 | Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS v4 |
-| Database | Supabase (Postgres + Auth) |
+| Database & Auth | Appwrite Cloud |
 | AI | Anthropic Claude (Haiku + Sonnet) |
 | Payments | Stripe |
 | Validation | Zod 4 |
@@ -121,7 +121,7 @@ Data flows through an HMAC-SHA256 authenticated webhook, persists to Supabase af
 
 - [Node.js](https://nodejs.org/) >= 22
 - [pnpm](https://pnpm.io/) >= 10
-- [Supabase](https://supabase.com/) project
+- [Appwrite Cloud](https://cloud.appwrite.io/) project
 - [Anthropic](https://console.anthropic.com/) API key
 - [Stripe](https://stripe.com/) account (for billing features)
 
@@ -141,10 +141,10 @@ cp .env.example .env.local
 
 Fill in your keys — see the [Environment Variables](#environment-variables) table below.
 
-### Database Migration
+### Database Setup
 
 ```bash
-pnpm dlx supabase db push
+npx tsx scripts/setup-appwrite.ts
 ```
 
 ### Run
@@ -161,9 +161,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (server-side only) |
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT` | Yes | Appwrite endpoint (e.g. `https://cloud.appwrite.io/v1`) |
+| `NEXT_PUBLIC_APPWRITE_PROJECT` | Yes | Appwrite project ID |
+| `APPWRITE_API_KEY` | Yes | Appwrite API key (server-side only) |
+| `APPWRITE_DATABASE_ID` | Yes | Appwrite database ID (default: `scout_db`) |
 | `ANTHROPIC_API_KEY` | Yes | Anthropic API key for Claude |
 | `STRIPE_SECRET_KEY` | Yes | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Yes | Stripe webhook signing secret |
@@ -196,10 +197,10 @@ scout-agent/
 │   ├── ingest/              # Webhook verification
 │   ├── refinery/            # Pipeline, scrubber, pattern matcher, strategist, gate
 │   ├── stripe/              # Stripe client + helpers
-│   └── supabase/            # Supabase clients (browser, server, admin)
+│   └── appwrite/            # Appwrite clients (admin, server, auth actions)
 ├── schemas/                 # Zod schemas (single source of truth)
 ├── types/                   # TypeScript types (z.infer<> re-exports)
-├── supabase/migrations/     # Database migrations
+├── scripts/                 # Database setup script
 ├── e2e/                     # Playwright E2E tests
 └── __fixtures__/            # Test fixtures
 ```

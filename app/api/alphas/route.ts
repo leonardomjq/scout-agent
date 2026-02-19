@@ -1,30 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { Query } from "node-appwrite";
+import { getLoggedInUser, createSessionClient } from "@/lib/appwrite/server";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
+import { documentToAlphaCard, getUserTier } from "@/lib/appwrite/helpers";
 import { gateAlphaCard } from "@/lib/refinery/gate";
-import type { AlphaCard, AlphaTier } from "@/types";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const user = await getLoggedInUser();
 
-    // Auth check
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user tier
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("tier")
-      .eq("id", user.id)
-      .single();
-
-    const tier: AlphaTier = (profile?.tier as AlphaTier) ?? "free";
+    const { databases } = await createSessionClient();
+    const tier = await getUserTier(user.$id, databases);
 
     // Parse query params
     const { searchParams } = new URL(request.url);
@@ -32,45 +22,44 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "20"), 50);
     const category = searchParams.get("category");
     const direction = searchParams.get("direction");
+    const status = searchParams.get("status");
 
-    // Build query
-    let query = supabase
-      .from("alpha_cards")
-      .select("*")
-      .eq("status", "active")
-      .gt("expires_at", new Date().toISOString())
-      .order("created_at", { ascending: false })
-      .limit(limit + 1); // +1 to detect next page
+    // Build query — default to showing fresh + warm cards
+    const statusFilter = status
+      ? [status]
+      : ["fresh", "warm"];
+
+    const queries = [
+      Query.equal("status", statusFilter),
+      Query.orderDesc("freshness_score"),
+      Query.limit(limit + 1), // +1 to detect next page
+    ];
 
     if (cursor) {
-      query = query.lt("id", cursor);
+      queries.push(Query.cursorAfter(cursor));
     }
     if (category) {
-      query = query.eq("category", category);
+      queries.push(Query.equal("category", [category]));
     }
     if (direction) {
-      query = query.eq("direction", direction);
+      queries.push(Query.equal("direction", [direction]));
     }
 
-    const { data: cards, error: queryError } = await query;
-
-    if (queryError) {
-      console.error("Query error:", queryError);
-      return NextResponse.json(
-        { error: "Failed to fetch alphas" },
-        { status: 500 }
-      );
-    }
-
-    const hasMore = (cards?.length ?? 0) > limit;
-    const items = (cards ?? []).slice(0, limit);
-
-    // Apply tier gating
-    const gatedCards = items.map((card) =>
-      gateAlphaCard(card as unknown as AlphaCard, tier)
+    const result = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.ALPHA_CARDS,
+      queries
     );
 
-    const nextCursor = hasMore ? items[items.length - 1]?.id : null;
+    const hasMore = result.documents.length > limit;
+    const items = result.documents.slice(0, limit);
+
+    // Map & apply tier gating
+    const gatedCards = items.map((doc) =>
+      gateAlphaCard(documentToAlphaCard(doc), tier)
+    );
+
+    const nextCursor = hasMore ? items[items.length - 1]?.$id : null;
 
     return NextResponse.json({
       data: gatedCards,

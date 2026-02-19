@@ -16,8 +16,8 @@ pnpm install
 cp .env.example .env.local
 # Fill in your keys (see .env.example for details)
 
-# Run database migrations
-pnpm dlx supabase db push
+# Set up Appwrite database (collections, attributes, indexes)
+npx tsx scripts/setup-appwrite.ts
 
 # Start dev server
 pnpm dev
@@ -78,7 +78,7 @@ test: add pattern matcher edge case coverage
 ## Architecture Notes
 
 - **Anthropic client** must be lazy-initialized (not top-level) to support test environments
-- **Supabase Json columns** need `JSON.parse(JSON.stringify(obj))` casting for inserts
+- **Appwrite JSON fields** are stored as strings — use `toJsonString()`/`fromJsonString()` helpers from `lib/appwrite/helpers.ts`
 - **Tier gating** uses `gateAlphaCard()` from `lib/refinery/gate.ts` — keep it DRY across API routes and server components
 - The pipeline persists state after each layer — partial success is expected
 

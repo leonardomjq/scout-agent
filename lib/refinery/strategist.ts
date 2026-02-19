@@ -1,54 +1,87 @@
 import { v4 as uuidv4 } from "uuid";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/appwrite/admin";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
+import { toJsonString } from "@/lib/appwrite/helpers";
 import { extractStructured } from "@/lib/ai";
 import { AlphaCardSchema } from "@/schemas/alpha";
-import type { AlphaCard, PatternCluster, ScrubberOutput } from "@/types";
+import type { AlphaCard, Signal, SignalSource, ScrubberOutput, EntityBaseline } from "@/types";
 
-const TTL_HOURS = 72;
-
-// Schema for LLM synthesis (without id/created_at/expires_at/status which we set)
+// Schema for LLM synthesis (omit fields we set ourselves)
 const StrategistOutputSchema = AlphaCardSchema.omit({
   id: true,
   created_at: true,
-  expires_at: true,
   status: true,
+  freshness_score: true,
   cluster_id: true,
 });
 
 function buildContext(
-  cluster: PatternCluster,
-  recentOutputs: ScrubberOutput[]
+  signal: Signal,
+  recentOutputs: ScrubberOutput[],
+  baselines: Map<string, EntityBaseline>,
+  originalSignals?: Map<string, SignalSource>
 ): string {
-  const entityList = cluster.entities.join(", ");
+  const entityList = signal.entities.join(", ");
   const frictionPoints: string[] = [];
   const insights: string[] = [];
 
   for (const output of recentOutputs) {
     for (const fp of output.friction_points) {
-      if (cluster.entities.some((e) => fp.entity.toLowerCase() === e.toLowerCase())) {
+      if (signal.entities.some((e) => fp.entity.toLowerCase() === e.toLowerCase())) {
         frictionPoints.push(`- [${fp.severity}] ${fp.entity}: ${fp.signal}`);
       }
     }
     for (const notable of output.notable_tweets) {
-      if (cluster.evidence_tweet_ids.includes(notable.tweet_id)) {
-        insights.push(
-          `- @tweet ${notable.tweet_id} (relevance: ${notable.relevance_score}): ${notable.extracted_insight}`
-        );
+      if (signal.evidence_tweet_ids.includes(notable.tweet_id)) {
+        // Look up original signal for real author/content
+        const source = originalSignals?.get(notable.tweet_id);
+        if (source && source.source_type === "twitter") {
+          insights.push(
+            `- @${source.author_handle}: "${source.content.slice(0, 280)}" (relevance: ${notable.relevance_score})`
+          );
+        } else if (source) {
+          insights.push(
+            `- [${source.source_type}]: "${source.content.slice(0, 280)}" (relevance: ${notable.relevance_score})`
+          );
+        } else {
+          insights.push(
+            `- ${notable.tweet_id} (relevance: ${notable.relevance_score}): ${notable.extracted_insight}`
+          );
+        }
       }
     }
   }
 
-  return `## Cluster Analysis
+  // Baseline context
+  const baselineInfo: string[] = [];
+  for (const entityName of signal.entities) {
+    const baseline = baselines.get(entityName.toLowerCase());
+    if (baseline) {
+      baselineInfo.push(
+        `- ${entityName}: ${baseline.baseline_mentions_per_day} mentions/day avg, sentiment ${baseline.baseline_sentiment}, friction rate ${baseline.baseline_friction_rate} (${baseline.daily_snapshots.length} days of history)`
+      );
+    }
+  }
+
+  return `## Signal Analysis
+Type: ${signal.type}
 Entities: ${entityList}
-Momentum Score: ${cluster.momentum_score}/100 (${cluster.direction}, delta: ${cluster.momentum_delta})
-Friction Density: ${cluster.friction_density}
-Evidence Tweets: ${cluster.evidence_tweet_ids.length}
-Window: ${cluster.window_hours}h
+Signal Strength: ${signal.signal_strength} (0-1)
+Direction: ${signal.direction}
+Mention Velocity: ${signal.mention_velocity}x (vs baseline)
+Sentiment Delta: ${signal.sentiment_delta}
+Friction Spike: ${signal.friction_spike}
+Evidence Sources: ${signal.evidence_tweet_ids.length}
+${signal.friction_theme ? `Friction Theme: ${signal.friction_theme}` : ""}
+Window: ${signal.window_hours}h
+
+## Entity Baselines
+${baselineInfo.length > 0 ? baselineInfo.join("\n") : "No baseline history yet (cold start)"}
 
 ## Friction Points
 ${frictionPoints.length > 0 ? frictionPoints.join("\n") : "None identified"}
 
-## Key Insights
+## Key Insights from Evidence
 ${insights.length > 0 ? insights.join("\n") : "No specific insights extracted"}`;
 }
 
@@ -59,47 +92,53 @@ export interface StrategistResult {
 }
 
 export async function synthesizeAlphaCard(
-  cluster: PatternCluster,
-  recentOutputs: ScrubberOutput[]
+  signal: Signal,
+  recentOutputs: ScrubberOutput[],
+  baselines: Map<string, EntityBaseline>,
+  originalSignals?: Map<string, SignalSource>
 ): Promise<StrategistResult> {
-  const context = buildContext(cluster, recentOutputs);
+  const context = buildContext(signal, recentOutputs, baselines, originalSignals);
 
   const result = await extractStructured({
     model: "claude-sonnet",
-    system: `You are a venture intelligence strategist. You transform technical signal clusters into actionable market intelligence ("Alpha Cards") for indie hackers, founders, and technical builders who want to find and capitalize on emerging opportunities.
+    system: `You are a developer intelligence analyst. You transform technical signal data into evidence-grounded intelligence briefs ("Alpha Cards") for developers, indie hackers, and technical builders.
 
-Your output must be:
-- Specific and actionable, not generic
-- Time-bound with clear opportunity windows
-- Evidence-backed with concrete examples
-- Risk-aware with honest assessment of uncertainties
-- Include a "Build This" blueprint: a concrete product idea with a buildable MVP plan
+CRITICAL RULES:
+1. Only make claims supported by evidence from the pipeline data provided
+2. Quote or paraphrase actual developer statements from the evidence
+3. Name specific tools, libraries, and versions when discussing gaps
+4. Quantify: reference actual mention counts, velocity ratios, and baseline comparisons
+5. NEVER invent product names, TAM numbers, pricing strategies, or speculative market sizes
+6. NEVER generate "Build This" blueprints or MVP plans — focus on WHAT is happening and WHY it matters
 
 Categories:
-- momentum_shift: Significant change in developer adoption/sentiment
-- friction_opportunity: Pain point creating market opportunity
-- emerging_tool: New tool gaining rapid traction
-- contrarian_signal: Counter-narrative worth investigating`,
-    prompt: `Based on this technical signal cluster, generate a complete Alpha Card intelligence brief with a "Build This" blueprint.
+- velocity_spike: Significant increase in developer discussion volume vs baseline
+- sentiment_flip: Notable shift in developer sentiment (positive→negative or vice versa)
+- friction_cluster: Multiple technologies sharing similar pain points
+- new_emergence: Previously unseen or very low-baseline entity suddenly gaining traction
+
+Opportunity types:
+- tooling_gap: Developers need a tool that doesn't exist yet
+- migration_aid: Developers are migrating between technologies and need help
+- dx_improvement: Existing tools work but have poor developer experience
+- integration: Developers need better connections between existing tools`,
+    prompt: `Based on this signal data, generate an Alpha Card intelligence brief.
 
 ${context}
 
 Generate a structured Alpha Card with:
-1. A compelling, specific title
-2. Correct category classification
-3. A thesis explaining the opportunity
-4. A concrete strategy for capitalizing on this signal
-5. Risk factors to consider
-6. Evidence supporting the thesis
-7. Friction details if applicable
-8. An opportunity window estimate
-9. A "Build This" blueprint containing:
-   - product_concept: A specific, concrete product/tool/SaaS idea (not vague — name exactly what it does)
-   - name_ideas: 3 catchy product name suggestions
-   - mvp_weeks: A 3-4 week MVP plan where each week has a goal and specific tasks
-   - monetization: A specific monetization strategy (pricing model, target price point, who pays)
-   - tech_stack: Recommended technologies to build it with
-   - estimated_tam: Rough total addressable market estimate based on the signals`,
+1. A compelling, specific title (mention the key entities)
+2. Correct category classification matching the signal type
+3. A thesis (2-3 sentences) explaining WHY this signal matters — reference the data
+4. Friction detail: specific pain points in developers' own words from the evidence
+5. Gap analysis: what exists vs what's missing, derived from the evidence
+6. Timing signal: why now — reference velocity data, baseline comparisons, acceleration
+7. Risk factors: counterarguments derived FROM THE DATA (not speculation)
+8. Evidence: curate the most relevant tweets (up to 15) with author, snippet, relevance score
+9. Competitive landscape: existing tools/solutions mentioned in the evidence
+10. Opportunity type classification
+
+The thesis should be insightful enough that a developer reading just the title + thesis understands the opportunity.`,
     schema: StrategistOutputSchema,
   });
 
@@ -108,14 +147,13 @@ Generate a structured Alpha Card with:
   }
 
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + TTL_HOURS * 60 * 60 * 1000);
 
   const card: AlphaCard = {
     id: uuidv4(),
     created_at: now.toISOString(),
-    expires_at: expiresAt.toISOString(),
-    status: "active",
-    cluster_id: cluster.cluster_id,
+    status: "fresh",
+    freshness_score: 1.0,
+    cluster_id: signal.signal_id,
     ...result.data,
   };
 
@@ -126,28 +164,30 @@ Generate a structured Alpha Card with:
 }
 
 export async function persistAlphaCard(card: AlphaCard): Promise<void> {
-  const supabase = createAdminClient();
+  const { databases } = createAdminClient();
 
-  const { error } = await supabase.from("alpha_cards").insert({
-    id: card.id,
-    created_at: card.created_at,
-    expires_at: card.expires_at,
-    status: card.status,
-    title: card.title,
-    category: card.category,
-    entities: card.entities,
-    momentum_score: card.momentum_score,
-    direction: card.direction,
-    signal_count: card.signal_count,
-    thesis: card.thesis,
-    strategy: card.strategy,
-    risk_factors: card.risk_factors,
-    evidence: card.evidence ? JSON.parse(JSON.stringify(card.evidence)) : null,
-    friction_detail: card.friction_detail,
-    opportunity_window: card.opportunity_window,
-    blueprint: card.blueprint ? JSON.parse(JSON.stringify(card.blueprint)) : null,
-    cluster_id: card.cluster_id,
-  });
-
-  if (error) throw new Error(`Failed to persist alpha card: ${error.message}`);
+  await databases.createDocument(
+    DATABASE_ID,
+    COLLECTIONS.ALPHA_CARDS,
+    card.id,
+    {
+      title: card.title,
+      category: card.category,
+      entities: card.entities,
+      signal_strength: card.signal_strength,
+      direction: card.direction,
+      signal_count: card.signal_count,
+      status: card.status,
+      freshness_score: card.freshness_score,
+      cluster_id: card.cluster_id,
+      thesis: card.thesis,
+      friction_detail: card.friction_detail ?? null,
+      gap_analysis: card.gap_analysis ?? null,
+      timing_signal: card.timing_signal ?? null,
+      risk_factors: card.risk_factors ?? null,
+      evidence: card.evidence ? toJsonString(card.evidence) : null,
+      competitive_landscape: card.competitive_landscape ?? null,
+      opportunity_type: card.opportunity_type ?? null,
+    }
+  );
 }

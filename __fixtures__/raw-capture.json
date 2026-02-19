@@ -1,10 +1,12 @@
 {
   "capture_id": "550e8400-e29b-41d4-a716-446655440000",
   "source_feed": "tech_devtools",
+  "source_type": "twitter",
   "captured_at": "2025-01-15T12:00:00Z",
   "agent_version": "1.0.0",
-  "tweets": [
+  "signals": [
     {
+      "source_type": "twitter",
       "tweet_id": "tweet-001",
       "author_handle": "devbuilder",
       "author_name": "Dev Builder",
@@ -22,6 +24,7 @@
       "hashtags": ["turbopack", "webpack", "dx"]
     },
     {
+      "source_type": "twitter",
       "tweet_id": "tweet-002",
       "author_handle": "rustdev42",
       "author_name": "Rust Developer",
@@ -39,6 +42,7 @@
       "hashtags": ["rust", "performance"]
     },
     {
+      "source_type": "twitter",
       "tweet_id": "tweet-003",
       "author_handle": "frontendlead",
       "author_name": "Frontend Lead",
@@ -56,6 +60,7 @@
       "hashtags": ["svelte", "react"]
     },
     {
+      "source_type": "twitter",
       "tweet_id": "tweet-004",
       "author_handle": "cloudarch",
       "author_name": "Cloud Architect",
@@ -73,6 +78,7 @@
       "hashtags": ["kubernetes", "docker", "kamal"]
     },
     {
+      "source_type": "twitter",
       "tweet_id": "tweet-005",
       "author_handle": "typescriptfan",
       "author_name": "TS Enthusiast",
@@ -90,6 +96,7 @@
       "hashtags": ["typescript"]
     },
     {
+      "source_type": "twitter",
       "tweet_id": "tweet-noise-001",
       "author_handle": "spambot",
       "author_name": "Win Big",

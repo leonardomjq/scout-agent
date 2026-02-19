@@ -1,68 +1,90 @@
 import { v4 as uuidv4 } from "uuid";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { Query } from "node-appwrite";
+import pLimit from "p-limit";
+import { createAdminClient } from "@/lib/appwrite/admin";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
+import { toJsonString, fromJsonString } from "@/lib/appwrite/helpers";
 import { runScrubber, persistScrubberOutput } from "./scrubber";
+import { updateBaselines } from "./baselines";
 import {
-  runPatternMatcher,
-  persistClusters,
+  runDeltaEngine,
+  persistSignals,
 } from "./pattern-matcher";
 import {
   synthesizeAlphaCard,
   persistAlphaCard,
 } from "./strategist";
-import type { PipelineRun, TweetData, ScrubberOutput } from "@/types";
+import type { PipelineRun, SignalSource, ScrubberOutput, Signal } from "@/types";
 import { PipelineRunSchema } from "@/schemas/pipeline";
 
 interface PipelineResult {
   run: PipelineRun;
 }
 
+const LOCK_DOC_ID = "pipeline_lock";
+
 export async function runPipeline(): Promise<PipelineResult> {
-  const supabase = createAdminClient();
+  const { databases } = createAdminClient();
 
-  // Check for concurrent runs
-  const { data: runningPipelines } = await supabase
-    .from("pipeline_runs")
-    .select("id")
-    .eq("status", "running")
-    .limit(1);
-
-  if (runningPipelines && runningPipelines.length > 0) {
-    throw new Error("Pipeline already running — concurrent execution prevented");
+  // Atomic lock: createDocument with fixed ID → 409 if already locked
+  try {
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.PIPELINE_LOCKS,
+      LOCK_DOC_ID,
+      {}
+    );
+  } catch (err: unknown) {
+    const e = err as { code?: number };
+    if (e.code === 409) {
+      throw new Error("Pipeline already running — concurrent execution prevented");
+    }
+    throw err;
   }
 
   // Create pipeline run record
   const runId = uuidv4();
   const startedAt = new Date().toISOString();
 
-  const { error: createError } = await supabase.from("pipeline_runs").insert({
-    id: runId,
-    started_at: startedAt,
-    status: "running",
-  });
-
-  if (createError) throw new Error(`Failed to create pipeline run: ${createError.message}`);
+  await databases.createDocument(
+    DATABASE_ID,
+    COLLECTIONS.PIPELINE_RUNS,
+    runId,
+    {
+      started_at: startedAt,
+      status: "running",
+      captures_processed: 0,
+      l1_stats: toJsonString({ input: 0, passed: 0, failed: 0 }),
+      l2_stats: toJsonString({ signals_found: 0, signals_qualifying: 0, baselines_updated: 0 }),
+      l3_stats: toJsonString({ cards_generated: 0, cards_updated: 0, failed: 0 }),
+      total_tokens_used: 0,
+      errors: [],
+    }
+  );
 
   const errors: string[] = [];
   let totalTokens = 0;
   let l1Stats = { input: 0, passed: 0, failed: 0 };
-  let l2Stats = { clusters_found: 0, clusters_qualifying: 0 };
-  let l3Stats = { briefs_generated: 0, failed: 0 };
+  let l2Stats = { signals_found: 0, signals_qualifying: 0, baselines_updated: 0 };
+  let l3Stats = { cards_generated: 0, cards_updated: 0, failed: 0 };
   let capturesProcessed = 0;
+  let finalStatus: "completed" | "failed" = "failed";
 
   try {
     // ========== LAYER 1: Scrubber ==========
     // Fetch pending captures
-    const { data: pendingCaptures, error: fetchError } = await supabase
-      .from("raw_captures")
-      .select("*")
-      .eq("status", "pending")
-      .order("created_at", { ascending: true })
-      .limit(10);
+    const pendingCaptures = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.RAW_CAPTURES,
+      [
+        Query.equal("status", ["pending"]),
+        Query.orderAsc("$createdAt"),
+        Query.limit(10),
+      ]
+    );
 
-    if (fetchError) throw new Error(`Failed to fetch captures: ${fetchError.message}`);
-    if (!pendingCaptures || pendingCaptures.length === 0) {
-      // Nothing to process
-      const run = await finalizePipeline(supabase, runId, startedAt, "completed", {
+    if (pendingCaptures.total === 0) {
+      const run = await finalizePipeline(databases, runId, startedAt, "completed", {
         capturesProcessed: 0,
         l1Stats,
         l2Stats,
@@ -73,31 +95,57 @@ export async function runPipeline(): Promise<PipelineResult> {
       return { run };
     }
 
-    // Get already-processed tweet IDs
-    const { data: processedRows } = await supabase
-      .from("processed_tweet_ids")
-      .select("tweet_id");
-    const processedTweetIds = new Set(
-      (processedRows ?? []).map((r) => r.tweet_id)
-    );
+    // Get already-processed signal IDs (paginate through all)
+    const processedIds = new Set<string>();
+    let cursor: string | undefined;
+    while (true) {
+      const queries = [Query.limit(5000)];
+      if (cursor) queries.push(Query.cursorAfter(cursor));
+      const page = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTIONS.PROCESSED_TWEET_IDS,
+        queries
+      );
+      for (const doc of page.documents) {
+        processedIds.add(doc.tweet_id as string);
+      }
+      if (page.documents.length < 5000) break;
+      cursor = page.documents[page.documents.length - 1].$id;
+    }
 
     const scrubberOutputs: ScrubberOutput[] = [];
+    // Collect original signals for L3 context (keyed by signal ID)
+    const originalSignalMap = new Map<string, SignalSource>();
 
-    for (const capture of pendingCaptures) {
+    for (const capture of pendingCaptures.documents) {
       // Mark as processing
-      await supabase
-        .from("raw_captures")
-        .update({ status: "processing" })
-        .eq("id", capture.id);
+      await databases.updateDocument(
+        DATABASE_ID,
+        COLLECTIONS.RAW_CAPTURES,
+        capture.$id,
+        { status: "processing" }
+      );
 
       try {
-        const tweets = (capture.payload as { tweets: TweetData[] }).tweets ?? [];
-        l1Stats.input += tweets.length;
+        const payload = fromJsonString<{ signals?: SignalSource[]; tweets?: SignalSource[] }>(
+          capture.payload as string
+        );
+        // Support both old "tweets" and new "signals" field names
+        const signals = payload.signals ?? payload.tweets ?? [];
+        l1Stats.input += signals.length;
+
+        // Index original signals by their ID for L3 context
+        for (const s of signals) {
+          const sid = "tweet_id" in s ? s.tweet_id
+            : "post_id" in s ? `${s.source_type}:${s.post_id}`
+            : "repo" in s ? `gh:${s.repo}` : "";
+          if (sid) originalSignalMap.set(sid, s);
+        }
 
         const scrubberResult = await runScrubber(
-          capture.capture_id,
-          tweets,
-          processedTweetIds
+          capture.capture_id as string,
+          signals,
+          processedIds
         );
 
         totalTokens += scrubberResult.tokensUsed;
@@ -105,21 +153,27 @@ export async function runPipeline(): Promise<PipelineResult> {
         l1Stats.failed += scrubberResult.errors.length;
 
         // Persist L1 output
-        await persistScrubberOutput(
-          scrubberResult.output,
-          tweets.map((t) => t.tweet_id)
-        );
+        const signalIds = signals.map((s) => {
+          if ("tweet_id" in s) return s.tweet_id;
+          if ("post_id" in s) return `${s.source_type}:${s.post_id}`;
+          if ("repo" in s) return `gh:${s.repo}`;
+          return "";
+        });
+
+        await persistScrubberOutput(scrubberResult.output, signalIds);
 
         scrubberOutputs.push(scrubberResult.output);
 
-        // Mark processed tweets in our local set too
-        for (const t of tweets) processedTweetIds.add(t.tweet_id);
+        // Mark processed IDs in our local set
+        for (const id of signalIds) processedIds.add(id);
 
         // Mark capture as processed
-        await supabase
-          .from("raw_captures")
-          .update({ status: "processed" })
-          .eq("id", capture.id);
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.RAW_CAPTURES,
+          capture.$id,
+          { status: "processed" }
+        );
 
         capturesProcessed++;
         for (const err of scrubberResult.errors) {
@@ -128,147 +182,171 @@ export async function runPipeline(): Promise<PipelineResult> {
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         errors.push(`L1 capture ${capture.capture_id}: ${msg}`);
-        await supabase
-          .from("raw_captures")
-          .update({ status: "failed", error_message: msg })
-          .eq("id", capture.id);
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.RAW_CAPTURES,
+          capture.$id,
+          { status: "failed", error_message: msg }
+        );
       }
     }
 
-    // ========== LAYER 2: Pattern Matcher ==========
+    // ========== LAYER 2: Delta Engine ==========
     // Get all recent scrubber outputs (last 48h)
     const windowStart = new Date(
       Date.now() - 48 * 60 * 60 * 1000
     ).toISOString();
-    const { data: recentOutputRows } = await supabase
-      .from("scrubber_outputs")
-      .select("*")
-      .gte("processed_at", windowStart);
 
-    const recentOutputs: ScrubberOutput[] = (recentOutputRows ?? []).map(
+    // TODO: paginate at scale — currently limited to 500 most recent outputs
+    const recentOutputDocs = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.SCRUBBER_OUTPUTS,
+      [Query.greaterThanEqual("processed_at", windowStart), Query.limit(500)]
+    );
+
+    const recentOutputs: ScrubberOutput[] = recentOutputDocs.documents.map(
       (row) => ({
-        capture_id: row.capture_id,
-        processed_at: row.processed_at,
-        total_input: row.total_input,
-        total_passed: row.total_passed,
-        entities: row.entities as unknown as ScrubberOutput["entities"],
-        friction_points: row.friction_points as unknown as ScrubberOutput["friction_points"],
-        notable_tweets: row.notable_tweets as unknown as ScrubberOutput["notable_tweets"],
+        capture_id: row.capture_id as string,
+        processed_at: row.processed_at as string,
+        total_input: row.total_input as number,
+        total_passed: row.total_passed as number,
+        entities: fromJsonString(row.entities as string),
+        friction_points: fromJsonString(row.friction_points as string),
+        notable_tweets: fromJsonString(row.notable_tweets as string),
       })
     );
 
-    // Get previous clusters for momentum delta
-    const { data: prevClusters } = await supabase
-      .from("pattern_clusters")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
+    // Update baselines from latest data
+    const { updated: baselinesUpdated, baselines } = await updateBaselines(recentOutputs);
+    l2Stats.baselines_updated = baselinesUpdated;
 
-    const previousClusters = (prevClusters ?? []).map((c) => ({
-      cluster_id: c.cluster_id,
-      entities: c.entities,
-      momentum_score: Number(c.momentum_score),
-      momentum_delta: Number(c.momentum_delta),
-      direction: c.direction as "rising" | "falling" | "stable",
-      evidence_tweet_ids: c.evidence_tweet_ids,
-      friction_density: Number(c.friction_density),
-      first_seen: c.first_seen,
-      window_hours: Number(c.window_hours),
-    }));
-
-    const patternResult = await runPatternMatcher(
-      recentOutputs,
-      previousClusters
+    // Get previous signals for delta computation
+    const prevSignalDocs = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.SIGNALS,
+      [Query.orderDesc("$createdAt"), Query.limit(100)]
     );
 
-    l2Stats.clusters_found = patternResult.totalFound;
-    l2Stats.clusters_qualifying = patternResult.qualifyingClusters.length;
+    const previousSignals: Signal[] = prevSignalDocs.documents.map((s) => ({
+      signal_id: s.signal_id as string,
+      type: s.type as Signal["type"],
+      entities: s.entities as string[],
+      signal_strength: Number(s.signal_strength),
+      friction_theme: (s.friction_theme as string) ?? null,
+      mention_velocity: Number(s.mention_velocity),
+      sentiment_delta: Number(s.sentiment_delta),
+      friction_spike: Number(s.friction_spike),
+      direction: s.direction as Signal["direction"],
+      evidence_tweet_ids: (s.evidence_tweet_ids as string[]) ?? [],
+      first_detected: s.first_detected as string,
+      window_hours: Number(s.window_hours),
+    }));
+
+    const deltaResult = await runDeltaEngine(
+      recentOutputs,
+      baselines,
+      previousSignals
+    );
+
+    l2Stats.signals_found = deltaResult.totalFound;
+    l2Stats.signals_qualifying = deltaResult.qualifyingSignals.length;
 
     // Persist L2 output
-    await persistClusters(patternResult.qualifyingClusters);
+    await persistSignals(deltaResult.qualifyingSignals);
 
-    // ========== LAYER 3: Strategist ==========
-    for (const cluster of patternResult.qualifyingClusters) {
-      try {
-        const strategistResult = await synthesizeAlphaCard(
-          cluster,
-          recentOutputs
-        );
-        totalTokens += strategistResult.tokensUsed;
-
-        if (strategistResult.error || !strategistResult.card) {
-          l3Stats.failed++;
-          errors.push(
-            `L3 cluster ${cluster.cluster_id}: ${strategistResult.error ?? "No card generated"}`
+    // ========== LAYER 3: Strategist (parallel with concurrency limit) ==========
+    const l3Limit = pLimit(3);
+    const l3Results = await Promise.allSettled(
+      deltaResult.qualifyingSignals.map((signal) =>
+        l3Limit(async () => {
+          const strategistResult = await synthesizeAlphaCard(
+            signal,
+            recentOutputs,
+            baselines,
+            originalSignalMap
           );
-          continue;
-        }
+          totalTokens += strategistResult.tokensUsed;
 
-        await persistAlphaCard(strategistResult.card);
-        l3Stats.briefs_generated++;
-      } catch (err) {
+          if (strategistResult.error || !strategistResult.card) {
+            l3Stats.failed++;
+            errors.push(
+              `L3 signal ${signal.signal_id}: ${strategistResult.error ?? "No card generated"}`
+            );
+            return;
+          }
+
+          await persistAlphaCard(strategistResult.card);
+          l3Stats.cards_generated++;
+        })
+      )
+    );
+
+    // Count unexpected rejections
+    for (const r of l3Results) {
+      if (r.status === "rejected") {
         l3Stats.failed++;
-        const msg = err instanceof Error ? err.message : String(err);
-        errors.push(`L3 cluster ${cluster.cluster_id}: ${msg}`);
+        const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
+        errors.push(`L3 unexpected: ${msg}`);
       }
     }
 
-    const run = await finalizePipeline(supabase, runId, startedAt, "completed", {
-      capturesProcessed,
-      l1Stats,
-      l2Stats,
-      l3Stats,
-      totalTokens,
-      errors,
-    });
-
-    return { run };
+    finalStatus = "completed";
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     errors.push(msg);
-
-    const run = await finalizePipeline(supabase, runId, startedAt, "failed", {
-      capturesProcessed,
-      l1Stats,
-      l2Stats,
-      l3Stats,
-      totalTokens,
-      errors,
-    });
-
-    return { run };
+    finalStatus = "failed";
+  } finally {
+    // Always release the lock, even if finalize throws
+    try {
+      await databases.deleteDocument(DATABASE_ID, COLLECTIONS.PIPELINE_LOCKS, LOCK_DOC_ID);
+    } catch {
+      // Lock may already be gone (e.g. manual cleanup) — safe to ignore
+    }
   }
+
+  const run = await finalizePipeline(databases, runId, startedAt, finalStatus, {
+    capturesProcessed,
+    l1Stats,
+    l2Stats,
+    l3Stats,
+    totalTokens,
+    errors,
+  });
+
+  return { run };
 }
 
 async function finalizePipeline(
-  supabase: ReturnType<typeof createAdminClient>,
+  databases: ReturnType<typeof createAdminClient>["databases"],
   runId: string,
   startedAt: string,
   status: "completed" | "failed",
   stats: {
     capturesProcessed: number;
     l1Stats: { input: number; passed: number; failed: number };
-    l2Stats: { clusters_found: number; clusters_qualifying: number };
-    l3Stats: { briefs_generated: number; failed: number };
+    l2Stats: { signals_found: number; signals_qualifying: number; baselines_updated: number };
+    l3Stats: { cards_generated: number; cards_updated: number; failed: number };
     totalTokens: number;
     errors: string[];
   }
 ): Promise<PipelineRun> {
   const completedAt = new Date().toISOString();
 
-  await supabase
-    .from("pipeline_runs")
-    .update({
+  await databases.updateDocument(
+    DATABASE_ID,
+    COLLECTIONS.PIPELINE_RUNS,
+    runId,
+    {
       completed_at: completedAt,
       status,
       captures_processed: stats.capturesProcessed,
-      l1_stats: stats.l1Stats,
-      l2_stats: stats.l2Stats,
-      l3_stats: stats.l3Stats,
+      l1_stats: toJsonString(stats.l1Stats),
+      l2_stats: toJsonString(stats.l2Stats),
+      l3_stats: toJsonString(stats.l3Stats),
       total_tokens_used: stats.totalTokens,
       errors: stats.errors,
-    })
-    .eq("id", runId);
+    }
+  );
 
   const run: PipelineRun = {
     id: runId,

@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
+import { Query } from "node-appwrite";
 import { redirect } from "next/navigation";
+import { getLoggedInUser, createSessionClient } from "@/lib/appwrite/server";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
 import { UpgradePrompt } from "@/components/upgrade-prompt";
 import { UpgradeSuccessToast } from "@/components/settings/upgrade-success-toast";
 import { Card } from "@/components/ui/card";
@@ -16,30 +18,32 @@ const proFeatures = [
 ];
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getLoggedInUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("tier, stripe_customer_id")
-    .eq("id", user.id)
-    .single();
+  const { databases } = await createSessionClient();
 
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .single();
+  const profile = await databases.getDocument(
+    DATABASE_ID,
+    COLLECTIONS.USER_PROFILES,
+    user.$id
+  );
 
-  const tier = profile?.tier ?? "free";
+  const subscriptions = await databases.listDocuments(
+    DATABASE_ID,
+    COLLECTIONS.SUBSCRIPTIONS,
+    [
+      Query.equal("user_id", [user.$id]),
+      Query.equal("status", ["active"]),
+      Query.limit(1),
+    ]
+  );
+
+  const subscription = subscriptions.documents[0] ?? null;
+
+  const tier = (profile.tier as string) ?? "free";
   const initial = (user.email?.[0] ?? "?").toUpperCase();
-  const memberSince = new Date(user.created_at).toLocaleDateString("en-US", {
+  const memberSince = new Date(user.$createdAt).toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
@@ -98,7 +102,7 @@ export default async function SettingsPage() {
               <span className="text-text-muted">Current period ends</span>
               <span>
                 {new Date(
-                  subscription.current_period_end,
+                  subscription.current_period_end as string,
                 ).toLocaleDateString()}
               </span>
             </div>

@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { getLoggedInUser, createSessionClient } from "@/lib/appwrite/server";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
+import { documentToAlphaCard, getUserTier } from "@/lib/appwrite/helpers";
 import { gateAlphaCard } from "@/lib/refinery/gate";
 import { MomentumBadge } from "@/components/momentum-badge";
 import { BlurGate } from "@/components/blur-gate";
@@ -7,7 +9,6 @@ import { CopyLinkButton } from "@/components/copy-link-button";
 import { InlineUpgradeHint } from "@/components/inline-upgrade-hint";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { AlphaCard, AlphaTier } from "@/types";
 import { notFound } from "next/navigation";
 
 interface Props {
@@ -15,39 +16,33 @@ interface Props {
 }
 
 const categoryLabels: Record<string, string> = {
-  momentum_shift: "Momentum Shift",
-  friction_opportunity: "Friction Opportunity",
-  emerging_tool: "Emerging Tool",
-  contrarian_signal: "Contrarian Signal",
+  velocity_spike: "Velocity Spike",
+  sentiment_flip: "Sentiment Flip",
+  friction_cluster: "Friction Cluster",
+  new_emergence: "New Emergence",
 };
 
 export default async function AlphaDetailPage({ params }: Props) {
   const { id } = await params;
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getLoggedInUser();
   if (!user) notFound();
 
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("tier")
-    .eq("id", user.id)
-    .single();
+  const { databases } = await createSessionClient();
+  const tier = await getUserTier(user.$id, databases);
 
-  const tier: AlphaTier = (profile?.tier as AlphaTier) ?? "free";
+  let rawDoc;
+  try {
+    rawDoc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.ALPHA_CARDS,
+      id
+    );
+  } catch {
+    notFound();
+  }
 
-  const { data: rawCard } = await supabase
-    .from("alpha_cards")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (!rawCard) notFound();
-
-  const card = gateAlphaCard(rawCard as unknown as AlphaCard, tier);
+  const card = gateAlphaCard(documentToAlphaCard(rawDoc), tier);
   const isLocked = tier === "free";
 
   return (
@@ -70,9 +65,15 @@ export default async function AlphaDetailPage({ params }: Props) {
               {categoryLabels[card.category] ?? card.category}
             </span>
             <MomentumBadge
-              score={card.momentum_score}
+              score={card.signal_strength}
               direction={card.direction}
             />
+            <Badge
+              variant={card.status === "fresh" ? "success" : "default"}
+              shape="pill"
+            >
+              {card.status}
+            </Badge>
           </div>
           <h1 className="text-3xl font-bold">{card.title}</h1>
         </div>
@@ -95,61 +96,33 @@ export default async function AlphaDetailPage({ params }: Props) {
             </div>
           </Card>
           <Card padding="compact">
-            <div className="text-text-muted text-xs mb-1">Momentum</div>
+            <div className="text-text-muted text-xs mb-1">Strength</div>
             <div className="text-2xl font-bold font-mono">
-              {Math.round(card.momentum_score)}
+              {Math.round(card.signal_strength * 100)}%
             </div>
           </Card>
           <Card padding="compact">
-            <div className="text-text-muted text-xs mb-1">Expires</div>
-            <div className="text-sm font-mono">
-              {new Date(card.expires_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-              })}
+            <div className="text-text-muted text-xs mb-1">Freshness</div>
+            <div className="text-2xl font-bold font-mono">
+              {Math.round(card.freshness_score * 100)}%
             </div>
           </Card>
         </div>
 
-        {/* Pro content sections */}
+        {/* Content sections */}
         <div className="space-y-6">
+          {/* Thesis (free tier) */}
           <section>
             <h2 className="text-lg font-semibold mb-3">Thesis</h2>
-            <BlurGate isLocked={isLocked}>
-              <p className="text-text-muted leading-relaxed">{card.thesis}</p>
-            </BlurGate>
+            <p className="text-text-muted leading-relaxed">{card.thesis}</p>
           </section>
 
-          <section>
-            <h2 className="text-lg font-semibold mb-3">Strategy</h2>
-            {isLocked ? (
-              <InlineUpgradeHint />
-            ) : (
-              <p className="text-text-muted leading-relaxed">{card.strategy}</p>
-            )}
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold mb-3">Risk Factors</h2>
-            {isLocked ? (
-              <InlineUpgradeHint />
-            ) : (
-              <ul className="list-disc list-inside text-text-muted space-y-1">
-                {card.risk_factors?.map((risk, i) => (
-                  <li key={i}>{risk}</li>
-                ))}
-              </ul>
-            )}
-          </section>
-
+          {/* Evidence (truncated for free, full for pro) */}
           <section>
             <h2 className="text-lg font-semibold mb-3">Evidence</h2>
-            {isLocked ? (
-              <InlineUpgradeHint />
-            ) : (
+            {card.evidence && card.evidence.length > 0 ? (
               <div className="space-y-3">
-                {card.evidence?.map((ev) => (
+                {card.evidence.map((ev) => (
                   <Card key={ev.tweet_id} padding="compact">
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-mono text-sm text-accent-green">
@@ -162,147 +135,81 @@ export default async function AlphaDetailPage({ params }: Props) {
                     <p className="text-text-muted text-sm">{ev.snippet}</p>
                   </Card>
                 ))}
+                {isLocked && (
+                  <InlineUpgradeHint />
+                )}
               </div>
+            ) : isLocked ? (
+              <InlineUpgradeHint />
+            ) : (
+              <p className="text-text-muted text-sm">No evidence available.</p>
             )}
           </section>
 
-          {card.friction_detail !== null && (
+          {/* Pro-only sections */}
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Friction Detail</h2>
+            {isLocked ? (
+              <InlineUpgradeHint />
+            ) : card.friction_detail ? (
+              <p className="text-text-muted leading-relaxed">
+                {card.friction_detail}
+              </p>
+            ) : null}
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Gap Analysis</h2>
+            {isLocked ? (
+              <InlineUpgradeHint />
+            ) : card.gap_analysis ? (
+              <p className="text-text-muted leading-relaxed">
+                {card.gap_analysis}
+              </p>
+            ) : null}
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Timing Signal</h2>
+            {isLocked ? (
+              <InlineUpgradeHint />
+            ) : card.timing_signal ? (
+              <p className="text-text-muted leading-relaxed">
+                {card.timing_signal}
+              </p>
+            ) : null}
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Competitive Landscape</h2>
+            {isLocked ? (
+              <InlineUpgradeHint />
+            ) : card.competitive_landscape ? (
+              <p className="text-text-muted leading-relaxed">
+                {card.competitive_landscape}
+              </p>
+            ) : null}
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Risk Factors</h2>
+            {isLocked ? (
+              <InlineUpgradeHint />
+            ) : card.risk_factors ? (
+              <ul className="list-disc list-inside text-text-muted space-y-1">
+                {card.risk_factors.map((risk, i) => (
+                  <li key={i}>{risk}</li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+
+          {card.opportunity_type && !isLocked && (
             <section>
-              <h2 className="text-lg font-semibold mb-3">Friction Detail</h2>
-              {isLocked ? (
-                <InlineUpgradeHint />
-              ) : (
-                <p className="text-text-muted leading-relaxed">
-                  {card.friction_detail}
-                </p>
-              )}
-            </section>
-          )}
-
-          {card.opportunity_window !== null && (
-            <section>
-              <h2 className="text-lg font-semibold mb-3">Opportunity Window</h2>
-              {isLocked ? (
-                <InlineUpgradeHint />
-              ) : (
-                <p className="text-text-muted leading-relaxed">
-                  {card.opportunity_window}
-                </p>
-              )}
-            </section>
-          )}
-
-          {/* Build This Blueprint */}
-          {card.blueprint !== null && (
-            <section className="border-t border-border pt-6">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-accent-green font-mono text-sm">
-                  //
-                </span>
-                <h2 className="text-xl font-bold">Build This</h2>
-              </div>
-              <BlurGate isLocked={isLocked}>
-                <div className="space-y-5">
-                  {/* Product concept */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-2">
-                      Product Concept
-                    </h3>
-                    <p className="text-text leading-relaxed">
-                      {card.blueprint.product_concept}
-                    </p>
-                  </div>
-
-                  {/* Name ideas */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-2">
-                      Name Ideas
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {card.blueprint.name_ideas.map((name) => (
-                        <Badge
-                          key={name}
-                          variant="success"
-                          shape="tag"
-                          className="text-sm px-3 py-1"
-                        >
-                          {name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* MVP Roadmap */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">
-                      MVP Roadmap
-                    </h3>
-                    <div className="space-y-4">
-                      {card.blueprint.mvp_weeks.map((week) => (
-                        <Card key={week.week} padding="compact">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="success" shape="tag">
-                              Week {week.week}
-                            </Badge>
-                            <span className="font-semibold text-sm">
-                              {week.goal}
-                            </span>
-                          </div>
-                          <ul className="space-y-1">
-                            {week.tasks.map((task, i) => (
-                              <li
-                                key={i}
-                                className="text-text-muted text-sm flex items-start gap-2"
-                              >
-                                <span className="text-border mt-1">-</span>
-                                {task}
-                              </li>
-                            ))}
-                          </ul>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tech stack */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-2">
-                      Tech Stack
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {card.blueprint.tech_stack.map((tech) => (
-                        <Badge
-                          key={tech}
-                          shape="tag"
-                          className="text-sm px-3 py-1"
-                        >
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Monetization */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-2">
-                      Monetization
-                    </h3>
-                    <p className="text-text-muted leading-relaxed">
-                      {card.blueprint.monetization}
-                    </p>
-                  </div>
-
-                  {/* TAM */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-2">
-                      Estimated Market
-                    </h3>
-                    <p className="text-text-muted leading-relaxed">
-                      {card.blueprint.estimated_tam}
-                    </p>
-                  </div>
-                </div>
-              </BlurGate>
+              <h2 className="text-lg font-semibold mb-3">Opportunity Type</h2>
+              <Badge variant="success" shape="tag" className="text-sm px-3 py-1">
+                {card.opportunity_type.replace("_", " ")}
+              </Badge>
             </section>
           )}
         </div>

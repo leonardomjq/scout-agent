@@ -5,9 +5,8 @@ import strategistResponse from "@/__fixtures__/strategist-response.json";
 const validCard = {
   id: "550e8400-e29b-41d4-a716-446655440000",
   created_at: "2025-01-15T12:00:00Z",
-  expires_at: "2025-01-18T12:00:00Z",
-  status: "active" as const,
-  cluster_id: "660e8400-e29b-41d4-a716-446655440000",
+  status: "fresh" as const,
+  freshness_score: 1.0,
   ...strategistResponse,
 };
 
@@ -19,31 +18,15 @@ describe("AlphaCardSchema", () => {
   it("validates a card with null pro fields (free tier)", () => {
     const freeCard = {
       ...validCard,
-      thesis: null,
-      strategy: null,
+      friction_detail: null,
+      gap_analysis: null,
+      timing_signal: null,
       risk_factors: null,
       evidence: null,
-      friction_detail: null,
-      opportunity_window: null,
-      blueprint: null,
+      competitive_landscape: null,
+      opportunity_type: null,
     };
     expect(() => AlphaCardSchema.parse(freeCard)).not.toThrow();
-  });
-
-  it("validates a complete blueprint", () => {
-    expect(validCard.blueprint).not.toBeNull();
-    const result = AlphaCardSchema.parse(validCard);
-    expect(result.blueprint).toBeDefined();
-    expect(result.blueprint!.name_ideas.length).toBeGreaterThan(0);
-    expect(result.blueprint!.mvp_weeks.length).toBeGreaterThan(0);
-  });
-
-  it("rejects blueprint with empty name_ideas", () => {
-    const bad = {
-      ...validCard,
-      blueprint: { ...validCard.blueprint, name_ideas: [] },
-    };
-    expect(() => AlphaCardSchema.parse(bad)).toThrow();
   });
 
   it("rejects invalid category", () => {
@@ -51,23 +34,23 @@ describe("AlphaCardSchema", () => {
     expect(() => AlphaCardSchema.parse(bad)).toThrow();
   });
 
-  it("rejects momentum_score below 0", () => {
-    const bad = { ...validCard, momentum_score: -1 };
+  it("rejects signal_strength below 0", () => {
+    const bad = { ...validCard, signal_strength: -0.1 };
     expect(() => AlphaCardSchema.parse(bad)).toThrow();
   });
 
-  it("rejects momentum_score above 100", () => {
-    const bad = { ...validCard, momentum_score: 101 };
+  it("rejects signal_strength above 1", () => {
+    const bad = { ...validCard, signal_strength: 1.1 };
     expect(() => AlphaCardSchema.parse(bad)).toThrow();
   });
 
   it("rejects invalid status", () => {
-    const bad = { ...validCard, status: "deleted" };
+    const bad = { ...validCard, status: "active" };
     expect(() => AlphaCardSchema.parse(bad)).toThrow();
   });
 
   it("rejects invalid direction", () => {
-    const bad = { ...validCard, direction: "sideways" };
+    const bad = { ...validCard, direction: "rising" };
     expect(() => AlphaCardSchema.parse(bad)).toThrow();
   });
 
@@ -78,14 +61,41 @@ describe("AlphaCardSchema", () => {
 
   it("validates all valid categories", () => {
     const categories = [
-      "momentum_shift",
-      "friction_opportunity",
-      "emerging_tool",
-      "contrarian_signal",
+      "velocity_spike",
+      "sentiment_flip",
+      "friction_cluster",
+      "new_emergence",
     ];
     for (const category of categories) {
       expect(() =>
         AlphaCardSchema.parse({ ...validCard, category })
+      ).not.toThrow();
+    }
+  });
+
+  it("validates all valid statuses", () => {
+    const statuses = ["fresh", "warm", "cold", "archived"];
+    for (const status of statuses) {
+      expect(() =>
+        AlphaCardSchema.parse({ ...validCard, status })
+      ).not.toThrow();
+    }
+  });
+
+  it("validates all valid directions", () => {
+    const directions = ["accelerating", "decelerating", "new"];
+    for (const direction of directions) {
+      expect(() =>
+        AlphaCardSchema.parse({ ...validCard, direction })
+      ).not.toThrow();
+    }
+  });
+
+  it("validates all valid opportunity_types", () => {
+    const types = ["tooling_gap", "migration_aid", "dx_improvement", "integration"];
+    for (const opportunity_type of types) {
+      expect(() =>
+        AlphaCardSchema.parse({ ...validCard, opportunity_type })
       ).not.toThrow();
     }
   });

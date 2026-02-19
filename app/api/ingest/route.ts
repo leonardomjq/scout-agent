@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ID, Query } from "node-appwrite";
 import { RawCaptureSchema } from "@/schemas/capture";
 import { verifyIngestRequest } from "@/lib/ingest/verify";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/appwrite/admin";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
+import { toJsonString } from "@/lib/appwrite/helpers";
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,14 +45,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Idempotency check
-    const supabase = createAdminClient();
-    const { data: existing } = await supabase
-      .from("raw_captures")
-      .select("id")
-      .eq("capture_id", capture.capture_id)
-      .limit(1);
+    const { databases } = createAdminClient();
+    const existing = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.RAW_CAPTURES,
+      [Query.equal("capture_id", [capture.capture_id]), Query.limit(1)]
+    );
 
-    if (existing && existing.length > 0) {
+    if (existing.total > 0) {
       return NextResponse.json(
         { message: "Capture already ingested", capture_id: capture.capture_id },
         { status: 200 }
@@ -57,22 +60,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Store raw capture
-    const { error: insertError } = await supabase.from("raw_captures").insert({
-      capture_id: capture.capture_id,
-      source_feed: capture.source_feed,
-      captured_at: capture.captured_at,
-      agent_version: capture.agent_version,
-      payload: JSON.parse(rawBody),
-      status: "pending",
-    });
-
-    if (insertError) {
-      console.error("Failed to store capture:", insertError);
-      return NextResponse.json(
-        { error: "Failed to store capture" },
-        { status: 500 }
-      );
-    }
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.RAW_CAPTURES,
+      ID.unique(),
+      {
+        capture_id: capture.capture_id,
+        source_feed: capture.source_feed,
+        source_type: capture.source_type,
+        captured_at: capture.captured_at,
+        agent_version: capture.agent_version,
+        payload: toJsonString(JSON.parse(rawBody)),
+        status: "pending",
+      }
+    );
 
     return NextResponse.json(
       { message: "Capture ingested", capture_id: capture.capture_id },

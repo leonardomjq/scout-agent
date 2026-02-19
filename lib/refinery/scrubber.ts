@@ -1,18 +1,21 @@
 import { z } from "zod";
+import { ID } from "node-appwrite";
 import pLimit from "p-limit";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/appwrite/admin";
+import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
+import { toJsonString } from "@/lib/appwrite/helpers";
 import { extractStructured } from "@/lib/ai";
 import {
   TechEntitySchema,
   FrictionPointSchema,
   ScrubberOutputSchema,
 } from "@/schemas/refinery";
-import type { TweetData, ScrubberOutput, TechEntity, FrictionPoint } from "@/types";
+import type { SignalSource, TwitterSignal, ScrubberOutput, TechEntity, FrictionPoint } from "@/types";
 
 const BATCH_SIZE = 25;
 const CONCURRENCY = 5;
 
-// Heuristic filter: keyword-based noise detection
+// Heuristic spam filter — catches engagement bait, giveaways, etc.
 const NOISE_PATTERNS = [
   /\bgiveaway\b/i,
   /\bairdrop\b/i,
@@ -24,34 +27,15 @@ const NOISE_PATTERNS = [
   /\b🚀{3,}/,
 ];
 
-const SIGNAL_KEYWORDS = [
-  "migration", "migrating", "switched", "switching",
-  "bug", "broken", "issue", "error", "crash",
-  "deprecated", "deprecating",
-  "released", "launching", "shipped",
-  "friction", "pain point", "workaround",
-  "benchmark", "performance", "faster", "slower",
-  "alternative", "replaced", "replacing",
-  "framework", "library", "sdk", "api",
-  "typescript", "rust", "go", "python", "javascript",
-  "react", "nextjs", "svelte", "vue", "angular",
-  "docker", "kubernetes", "wasm", "edge",
-];
-
 export function isNoise(content: string): boolean {
   return NOISE_PATTERNS.some((p) => p.test(content));
 }
 
-export function hasSignal(content: string): boolean {
-  const lower = content.toLowerCase();
-  return SIGNAL_KEYWORDS.some((kw) => lower.includes(kw));
+export function filterSignals(signals: SignalSource[]): SignalSource[] {
+  return signals.filter((s) => !isNoise(s.content));
 }
 
-export function filterTweets(tweets: TweetData[]): TweetData[] {
-  return tweets.filter((t) => !isNoise(t.content) && hasSignal(t.content));
-}
-
-// Schema for LLM batch extraction
+// Schema for LLM batch extraction — now includes mention_context
 const BatchExtractionSchema = z.object({
   entities: z.array(TechEntitySchema),
   friction_points: z.array(FrictionPointSchema),
@@ -74,28 +58,75 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
   return chunks;
 }
 
+function formatSignalForPrompt(signal: SignalSource): string {
+  switch (signal.source_type) {
+    case "twitter": {
+      const t = signal as TwitterSignal;
+      return `[${t.tweet_id}] @${t.author_handle} (${t.author_followers} followers): ${t.content.slice(0, 500)}`;
+    }
+    case "github":
+      return `[github:${signal.repo}] ${signal.event_type}: ${signal.content.slice(0, 500)} (stars Δ${signal.stars_delta}, issues Δ${signal.issues_delta})`;
+    case "hackernews":
+      return `[hn:${signal.post_id}] ${signal.content.slice(0, 500)} (${signal.points} points, ${signal.comment_count} comments)`;
+    case "reddit":
+      return `[reddit:r/${signal.subreddit}:${signal.post_id}] ${signal.content.slice(0, 500)} (${signal.upvotes} upvotes)`;
+  }
+}
+
+function getSignalId(signal: SignalSource): string {
+  switch (signal.source_type) {
+    case "twitter":
+      return signal.tweet_id;
+    case "github":
+      return `gh:${signal.repo}:${signal.event_type}`;
+    case "hackernews":
+      return `hn:${signal.post_id}`;
+    case "reddit":
+      return `rd:${signal.post_id}`;
+  }
+}
+
+function getSourceTypeLabel(sourceType: SignalSource["source_type"]): string {
+  switch (sourceType) {
+    case "twitter":
+      return "developer tweets";
+    case "github":
+      return "GitHub events";
+    case "hackernews":
+      return "Hacker News posts";
+    case "reddit":
+      return "Reddit posts";
+  }
+}
+
 async function extractBatch(
-  tweets: TweetData[]
+  signals: SignalSource[]
 ): Promise<{ data: BatchExtraction | null; tokensUsed: number; error?: string }> {
-  const tweetSummaries = tweets
-    .map(
-      (t) =>
-        `[${t.tweet_id}] @${t.author_handle} (${t.author_followers} followers): ${t.content.slice(0, 500)}`
-    )
+  const sourceType = signals[0]?.source_type ?? "twitter";
+  const summaries = signals
+    .map((s) => formatSignalForPrompt(s))
     .join("\n\n");
 
   const result = await extractStructured<BatchExtraction>({
     model: "claude-haiku",
-    system: `You are a tech-market intelligence analyst. Extract structured signals from developer tweets.
+    system: `You are a tech-market intelligence analyst. Extract structured signals from ${getSourceTypeLabel(sourceType)}.
 Focus on: technology shifts, developer friction points, emerging tools, sentiment changes.
-Be precise with entity categorization and friction severity assessment.`,
-    prompt: `Analyze these developer tweets and extract:
-1. Tech entities mentioned (frameworks, languages, tools, platforms, protocols, concepts) with sentiment and friction signals
-2. Friction points (pain points, bugs, migration issues) with severity
-3. Notable tweets with relevance scores (0-1) and extracted insights
+Be precise with entity categorization and friction severity assessment.
 
-Tweets:
-${tweetSummaries}`,
+For each entity, include a mention_context classifying WHY it was mentioned:
+- announcement: new release, launch, or official update
+- complaint: expressing frustration, reporting bugs, or criticism
+- migration: switching from/to this technology
+- comparison: comparing with alternatives
+- praise: positive experience or endorsement
+- question: asking about or seeking help with`,
+    prompt: `Analyze these developer signals and extract:
+1. Tech entities mentioned (frameworks, languages, tools, platforms, protocols, concepts) with sentiment, mention_context, and friction signals
+2. Friction points (pain points, bugs, migration issues) with severity
+3. Notable items with relevance scores (0-1) and extracted insights
+
+Signals:
+${summaries}`,
     schema: BatchExtractionSchema,
   });
 
@@ -113,17 +144,17 @@ export interface ScrubberResult {
 
 export async function runScrubber(
   captureId: string,
-  tweets: TweetData[],
-  processedTweetIds: Set<string>
+  signals: SignalSource[],
+  processedIds: Set<string>
 ): Promise<ScrubberResult> {
-  // Dedup at tweet level
-  const newTweets = tweets.filter((t) => !processedTweetIds.has(t.tweet_id));
+  // Dedup at signal level
+  const newSignals = signals.filter((s) => !processedIds.has(getSignalId(s)));
 
-  // Heuristic filter
-  const signalTweets = filterTweets(newTweets);
+  // Spam filter only — no keyword pre-filter
+  const cleanSignals = filterSignals(newSignals);
 
   // Batch and extract
-  const batches = chunkArray(signalTweets, BATCH_SIZE);
+  const batches = chunkArray(cleanSignals, BATCH_SIZE);
   const limit = pLimit(CONCURRENCY);
   let totalTokens = 0;
   const errors: Array<{ batchIndex: number; error: string }> = [];
@@ -155,24 +186,31 @@ export async function runScrubber(
     }
   });
 
-  // Merge duplicate entities by name
+  // Merge duplicate entities by name (keep mention_context from highest individual count)
   const entityMap = new Map<string, TechEntity>();
+  const bestMentions = new Map<string, number>();
   for (const entity of allEntities) {
     const key = entity.name.toLowerCase();
     const existing = entityMap.get(key);
     if (existing) {
       existing.mentions += entity.mentions;
       if (entity.friction_signal) existing.friction_signal = true;
+      // Keep mention_context from the entry with the highest individual count
+      if (entity.mentions > (bestMentions.get(key) ?? 0)) {
+        bestMentions.set(key, entity.mentions);
+        existing.mention_context = entity.mention_context;
+      }
     } else {
       entityMap.set(key, { ...entity });
+      bestMentions.set(key, entity.mentions);
     }
   }
 
   const output: ScrubberOutput = {
     capture_id: captureId,
     processed_at: new Date().toISOString(),
-    total_input: tweets.length,
-    total_passed: signalTweets.length,
+    total_input: signals.length,
+    total_passed: cleanSignals.length,
     entities: Array.from(entityMap.values()),
     friction_points: allFriction,
     notable_tweets: allNotable,
@@ -186,37 +224,54 @@ export async function runScrubber(
 
 export async function persistScrubberOutput(
   output: ScrubberOutput,
-  tweetIds: string[]
+  signalIds: string[]
 ): Promise<void> {
-  const supabase = createAdminClient();
+  const { databases } = createAdminClient();
 
   // Insert scrubber output
-  const { error: insertError } = await supabase
-    .from("scrubber_outputs")
-    .insert({
+  await databases.createDocument(
+    DATABASE_ID,
+    COLLECTIONS.SCRUBBER_OUTPUTS,
+    ID.unique(),
+    {
       capture_id: output.capture_id,
       processed_at: output.processed_at,
       total_input: output.total_input,
       total_passed: output.total_passed,
-      entities: JSON.parse(JSON.stringify(output.entities)),
-      friction_points: JSON.parse(JSON.stringify(output.friction_points)),
-      notable_tweets: JSON.parse(JSON.stringify(output.notable_tweets)),
-    });
+      entities: toJsonString(output.entities),
+      friction_points: toJsonString(output.friction_points),
+      notable_tweets: toJsonString(output.notable_tweets),
+    }
+  );
 
-  if (insertError) throw new Error(`Failed to insert scrubber output: ${insertError.message}`);
+  // Mark signals as processed (catch 409 for duplicate unique index)
+  if (signalIds.length > 0) {
+    const results = await Promise.allSettled(
+      signalIds.map((id) =>
+        databases
+          .createDocument(
+            DATABASE_ID,
+            COLLECTIONS.PROCESSED_TWEET_IDS,
+            ID.unique(),
+            {
+              tweet_id: id,
+              capture_id: output.capture_id,
+            }
+          )
+          .catch((err: unknown) => {
+            const e = err as { code?: number };
+            // 409 = duplicate unique index — already processed, safe to ignore
+            if (e.code !== 409) throw err;
+          })
+      )
+    );
 
-  // Mark tweets as processed
-  if (tweetIds.length > 0) {
-    const { error: tweetError } = await supabase
-      .from("processed_tweet_ids")
-      .upsert(
-        tweetIds.map((id) => ({
-          tweet_id: id,
-          capture_id: output.capture_id,
-        })),
-        { onConflict: "tweet_id" }
-      );
-
-    if (tweetError) throw new Error(`Failed to mark tweets as processed: ${tweetError.message}`);
+    const failures = results.filter((r) => r.status === "rejected");
+    for (const f of failures) {
+      console.error("persistScrubberOutput write failed:", (f as PromiseRejectedResult).reason);
+    }
+    if (failures.length > signalIds.length / 2) {
+      throw new Error(`persistScrubberOutput: ${failures.length}/${signalIds.length} writes failed (>50%)`);
+    }
   }
 }

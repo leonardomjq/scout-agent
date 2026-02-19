@@ -19,25 +19,25 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const CATEGORIES: Array<{ value: AlphaCategory | ""; label: string }> = [
   { value: "", label: "All" },
-  { value: "momentum_shift", label: "Momentum" },
-  { value: "friction_opportunity", label: "Friction" },
-  { value: "emerging_tool", label: "Emerging" },
-  { value: "contrarian_signal", label: "Contrarian" },
+  { value: "velocity_spike", label: "Velocity" },
+  { value: "sentiment_flip", label: "Sentiment" },
+  { value: "friction_cluster", label: "Friction" },
+  { value: "new_emergence", label: "Emerging" },
 ];
 
 const DIRECTIONS: Array<{ value: AlphaDirection | ""; label: string }> = [
   { value: "", label: "All" },
-  { value: "rising", label: "Rising" },
-  { value: "falling", label: "Falling" },
-  { value: "stable", label: "Stable" },
+  { value: "accelerating", label: "Accelerating" },
+  { value: "decelerating", label: "Decelerating" },
+  { value: "new", label: "New" },
 ];
 
-type SortOption = "newest" | "momentum" | "expiring";
+type SortOption = "newest" | "strength" | "freshness";
 
 const SORT_OPTIONS: Array<{ value: SortOption; label: string; Icon: typeof Zap }> = [
   { value: "newest", label: "Newest", Icon: Clock },
-  { value: "momentum", label: "Highest Momentum", Icon: Zap },
-  { value: "expiring", label: "Expiring Soon", Icon: ArrowDownWideNarrow },
+  { value: "strength", label: "Strongest Signal", Icon: Zap },
+  { value: "freshness", label: "Most Fresh", Icon: ArrowDownWideNarrow },
 ];
 
 export function AlphaFeed() {
@@ -80,13 +80,10 @@ export function AlphaFeed() {
   const cards = useMemo(() => {
     if (sortBy === "newest") return filtered;
     const sorted = [...filtered];
-    if (sortBy === "momentum") {
-      sorted.sort((a, b) => b.momentum_score - a.momentum_score);
-    } else if (sortBy === "expiring") {
-      sorted.sort(
-        (a, b) =>
-          new Date(a.expires_at).getTime() - new Date(b.expires_at).getTime()
-      );
+    if (sortBy === "strength") {
+      sorted.sort((a, b) => b.signal_strength - a.signal_strength);
+    } else if (sortBy === "freshness") {
+      sorted.sort((a, b) => b.freshness_score - a.freshness_score);
     }
     return sorted;
   }, [filtered, sortBy]);
@@ -180,21 +177,21 @@ export function AlphaFeed() {
             Your feed is warming up
           </h3>
           <p className="text-text-muted text-sm max-w-md mb-6">
-            ScoutAgent is scanning developer activity and clustering traction
+            ScoutAgent is scanning developer activity and detecting traction
             signals. Here&apos;s what to expect:
           </p>
           <ol className="text-left text-sm text-text-muted space-y-2 max-w-sm">
             <li className="flex items-start gap-2">
               <span className="text-accent-green font-mono font-bold">1.</span>
-              Traction clusters detected across dev communities
+              Anomalies detected across developer communities
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent-green font-mono font-bold">2.</span>
-              Alpha Cards generated with 72-hour time-to-live
+              Alpha Cards generated with evidence-grounded intelligence
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent-green font-mono font-bold">3.</span>
-              Pro unlocks full thesis, strategy, and blueprints
+              Pro unlocks full evidence trails and gap analysis
             </li>
           </ol>
         </div>

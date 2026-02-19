@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getLoggedInUser } from "@/lib/appwrite/server";
 import { getStripe } from "@/lib/stripe/client";
 import { createOrGetCustomer } from "@/lib/stripe/helpers";
 
 export async function POST() {
   try {
-    const supabase = await createClient();
+    const user = await getLoggedInUser();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const customerId = await createOrGetCustomer(user.id, user.email!);
+    const customerId = await createOrGetCustomer(user.$id, user.email);
     const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
@@ -31,7 +26,7 @@ export async function POST() {
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
       metadata: {
-        supabase_user_id: user.id,
+        user_id: user.$id,
       },
     });
 

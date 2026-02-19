@@ -1,54 +1,43 @@
 import { z } from "zod";
 
+export const EvidenceSchema = z.object({
+  tweet_id: z.string(),
+  author: z.string(),
+  snippet: z.string(),
+  relevance: z.number().min(0).max(1),
+});
+
 export const AlphaCardSchema = z.object({
   id: z.string().uuid(),
   created_at: z.string().datetime(),
-  expires_at: z.string().datetime(),
-  status: z.enum(["active", "expired", "archived"]),
-  // Free tier fields
+  status: z.enum(["fresh", "warm", "cold", "archived"]),
+  freshness_score: z.number().min(0).max(1),
+
+  // === FREE TIER (visible to all) ===
   title: z.string(),
   category: z.enum([
-    "momentum_shift",
-    "friction_opportunity",
-    "emerging_tool",
-    "contrarian_signal",
+    "velocity_spike",
+    "sentiment_flip",
+    "friction_cluster",
+    "new_emergence",
   ]),
   entities: z.array(z.string()),
-  momentum_score: z.number().min(0).max(100),
-  direction: z.enum(["rising", "falling", "stable"]),
+  signal_strength: z.number().min(0).max(1),
+  direction: z.enum(["accelerating", "decelerating", "new"]),
   signal_count: z.number().int(),
-  // Pro tier fields (nullable for free users after gating)
-  thesis: z.string().nullable(),
-  strategy: z.string().nullable(),
-  risk_factors: z.array(z.string()).nullable(),
-  evidence: z
-    .array(
-      z.object({
-        tweet_id: z.string(),
-        author: z.string(),
-        snippet: z.string(),
-        relevance: z.number(),
-      })
-    )
-    .nullable(),
+  thesis: z.string(),
+
+  // === PRO TIER (gated — nullable for free users) ===
   friction_detail: z.string().nullable(),
-  opportunity_window: z.string().nullable(),
-  // "Build This" Blueprint (Pro tier)
-  blueprint: z
-    .object({
-      product_concept: z.string(),
-      name_ideas: z.array(z.string()).min(1).max(5),
-      mvp_weeks: z.array(
-        z.object({
-          week: z.number().int().min(1),
-          goal: z.string(),
-          tasks: z.array(z.string()),
-        })
-      ),
-      monetization: z.string(),
-      tech_stack: z.array(z.string()),
-      estimated_tam: z.string(),
-    })
+  gap_analysis: z.string().nullable(),
+  timing_signal: z.string().nullable(),
+  risk_factors: z.array(z.string()).nullable(),
+  evidence: z.array(EvidenceSchema).nullable(),
+  competitive_landscape: z.string().nullable(),
+  opportunity_type: z
+    .enum(["tooling_gap", "migration_aid", "dx_improvement", "integration"])
     .nullable(),
+
+  // === METADATA ===
   cluster_id: z.string().uuid(),
 });

@@ -12,7 +12,7 @@ export const LayerResultSchema = z.object({
     z.object({
       message: z.string(),
       code: z.string().optional(),
-      layer: z.enum(["scrubber", "pattern_matcher", "strategist"]),
+      layer: z.enum(["scrubber", "delta_engine", "strategist"]),
     })
   ),
 });
@@ -29,11 +29,13 @@ export const PipelineRunSchema = z.object({
     failed: z.number(),
   }),
   l2_stats: z.object({
-    clusters_found: z.number(),
-    clusters_qualifying: z.number(),
+    signals_found: z.number(),
+    signals_qualifying: z.number(),
+    baselines_updated: z.number(),
   }),
   l3_stats: z.object({
-    briefs_generated: z.number(),
+    cards_generated: z.number(),
+    cards_updated: z.number(),
     failed: z.number(),
   }),
   total_tokens_used: z.number().int(),

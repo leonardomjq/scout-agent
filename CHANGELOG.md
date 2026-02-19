@@ -14,5 +14,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tier-gated access (free / pro) with Stripe billing
 - HMAC-SHA256 authenticated ingest webhook
 - Dashboard with signal feed, detail views, and settings
-- Supabase-backed persistence and auth
+- Appwrite Cloud persistence and auth
 - Playwright E2E and Vitest unit test suites

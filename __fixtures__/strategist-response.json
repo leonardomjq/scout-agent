@@ -1,12 +1,14 @@
 {
-  "title": "K8s Exodus: Simplification Wave Creates Deploy-Tool Opportunity",
-  "category": "friction_opportunity",
+  "title": "ORM Migration Pain Is Spiking Across Prisma & Drizzle",
+  "category": "friction_cluster",
   "entities": ["kubernetes", "docker", "kamal"],
-  "momentum_score": 72,
-  "direction": "rising",
+  "signal_strength": 0.72,
+  "direction": "accelerating",
   "signal_count": 5,
   "thesis": "Developer teams are actively migrating away from Kubernetes to simpler deployment solutions like Kamal and Docker Compose. The primary driver is cost reduction (70%+ savings reported) and complexity reduction (90%+ reported). This creates opportunities in the deployment simplification tooling space.",
-  "strategy": "Build or invest in deployment abstraction tools that offer K8s-like reliability with Docker Compose-like simplicity. Target mid-size teams (10-50 engineers) who adopted K8s prematurely. Key differentiators: zero-config deployments, built-in monitoring, and one-click rollbacks.",
+  "friction_detail": "Primary friction in K8s ecosystem: operational complexity, cost overhead for small/medium teams, steep learning curve. Teams report 90% complexity reduction after migration, suggesting K8s is significantly over-engineered for most use cases.",
+  "gap_analysis": "Current tools like Kamal and Docker Compose handle basic deployments but lack K8s-like reliability guarantees. No tool currently offers automated K8s-to-simple migration, incompatibility detection, or rollback support in a simple package.",
+  "timing_signal": "Mention velocity at 3.2x baseline over the past 48 hours, up from 1.8x last week. Sentiment shifted negative by 0.35 points. This is an accelerating signal — the conversation is growing, not plateauing.",
   "risk_factors": [
     "Large enterprises with dedicated platform teams unlikely to migrate",
     "Kubernetes ecosystem continues to improve developer experience",
@@ -26,55 +28,7 @@
       "relevance": 0.65
     }
   ],
-  "friction_detail": "Primary friction in K8s ecosystem: operational complexity, cost overhead for small/medium teams, steep learning curve. Teams report 90% complexity reduction after migration, suggesting K8s is significantly over-engineered for most use cases.",
-  "opportunity_window": "6-12 months. The simplification trend is accelerating but no dominant alternative has emerged yet. Early movers in the 'simple deployment' space can capture significant market share before consolidation.",
-  "blueprint": {
-    "product_concept": "A CLI tool that auto-converts Kubernetes YAML manifests into Docker Compose + Kamal configurations. Scan an existing K8s deployment, generate equivalent simple deployment configs, highlight incompatibilities, and provide a migration checklist. One command to go from K8s to simple.",
-    "name_ideas": ["KubeEject", "SimpleDeploy", "ExitK8s"],
-    "mvp_weeks": [
-      {
-        "week": 1,
-        "goal": "Core YAML parser and Docker Compose output",
-        "tasks": [
-          "Build K8s YAML parser for Deployments, Services, ConfigMaps",
-          "Map K8s resources to Docker Compose equivalents",
-          "Generate docker-compose.yml output",
-          "Handle environment variables and secrets mapping"
-        ]
-      },
-      {
-        "week": 2,
-        "goal": "Kamal output and incompatibility detection",
-        "tasks": [
-          "Add Kamal deploy.yml generation",
-          "Build incompatibility detector (PVCs, CRDs, operators)",
-          "Generate migration checklist with manual steps",
-          "Add multi-service support"
-        ]
-      },
-      {
-        "week": 3,
-        "goal": "CLI polish and distribution",
-        "tasks": [
-          "Build interactive CLI with progress indicators",
-          "Add --dry-run and --diff modes",
-          "Package as npm/brew installable",
-          "Write landing page and README"
-        ]
-      },
-      {
-        "week": 4,
-        "goal": "Launch and feedback",
-        "tasks": [
-          "Launch on Hacker News and Reddit r/devops",
-          "Post Show HN with benchmark results",
-          "Set up feedback collection and analytics",
-          "Begin building hosted version with monitoring dashboard"
-        ]
-      }
-    ],
-    "monetization": "Freemium: CLI is free and open source for single-project conversions. Pro tier at $29/mo for teams: batch conversion, CI/CD integration, monitoring dashboard, and rollback support. Enterprise tier at $199/mo for audit logging and SSO.",
-    "tech_stack": ["TypeScript", "Node.js", "Commander.js", "Next.js (dashboard)", "Docker SDK"],
-    "estimated_tam": "~500K teams currently running Kubernetes. If 10% of small/mid teams (50K) are considering simplification, and 5% convert at $29/mo = $870K ARR addressable in year 1."
-  }
+  "competitive_landscape": "Kamal (Rails-centric, limited to Ruby ecosystem), Docker Compose (manual config, no deployment orchestration), Coolify (self-hosted PaaS, early stage). No tool addresses the K8s migration path specifically.",
+  "opportunity_type": "migration_aid",
+  "cluster_id": "660e8400-e29b-41d4-a716-446655440000"
 }
