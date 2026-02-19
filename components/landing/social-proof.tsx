@@ -2,13 +2,13 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { landingStagger, landingStaggerItem } from "@/lib/landing-motion";
+import { clipRevealStagger, clipRevealItem } from "@/lib/motion";
 
 const audiences = [
   "Indie Hackers",
-  "Technical Founders",
+  "Solo Founders",
+  "Micro-SaaS Builders",
   "Early-Stage VCs",
-  "Dev Tool Builders",
 ];
 
 const sources = ["Twitter / X", "GitHub", "Hacker News", "Reddit"];
@@ -21,20 +21,20 @@ export function SocialProof() {
     <section className="px-6 py-20 max-w-4xl mx-auto" ref={ref}>
       <motion.div
         className="text-center"
-        variants={landingStagger}
+        variants={clipRevealStagger}
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
       >
         {/* Built For */}
-        <motion.div variants={landingStaggerItem}>
-          <div className="font-mono text-[10px] text-landing-muted uppercase tracking-widest mb-4">
+        <motion.div variants={clipRevealItem}>
+          <div className="font-mono text-[10px] text-text-dim uppercase tracking-widest mb-4">
             Built For
           </div>
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {audiences.map((audience) => (
               <span
                 key={audience}
-                className="font-mono text-xs border border-landing-muted/30 text-landing-text rounded-full px-4 py-1.5"
+                className="font-mono text-xs border border-text-dim/30 text-text rounded-full px-4 py-1.5"
               >
                 {audience}
               </span>
@@ -43,15 +43,15 @@ export function SocialProof() {
         </motion.div>
 
         {/* Source Platforms */}
-        <motion.div variants={landingStaggerItem}>
-          <div className="font-mono text-[10px] text-landing-muted uppercase tracking-widest mb-4">
-            Monitoring signals from
+        <motion.div variants={clipRevealItem}>
+          <div className="font-mono text-[10px] text-text-dim uppercase tracking-widest mb-4">
+            Scanning opportunities across
           </div>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             {sources.map((source) => (
               <span
                 key={source}
-                className="font-mono text-sm text-landing-archival"
+                className="font-mono text-sm text-text-muted"
               >
                 {source}
               </span>

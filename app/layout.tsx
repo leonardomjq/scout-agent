@@ -31,7 +31,7 @@ const ibmPlexSerif = IBM_Plex_Serif({
 export const metadata: Metadata = {
   title: "ScoutAgent — Venture Intelligence",
   description:
-    "Your AI venture analyst. ScoutAgent tracks what developers are building and shipping, spots where traction is clustering, and delivers actionable opportunity briefs.",
+    "Your AI venture analyst. ScoutAgent scans thousands of conversations to spot demand spikes, market gaps, and emerging opportunities — then delivers actionable business briefs before markets get crowded.",
 };
 
 export default function RootLayout({
