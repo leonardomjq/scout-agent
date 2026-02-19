@@ -28,18 +28,18 @@ export function StickyCta() {
         <>
           {/* Desktop: top bar */}
           <motion.div
-            className="fixed top-0 left-0 right-0 z-overlay hidden md:flex items-center justify-between px-6 py-3 bg-landing-surface/80 backdrop-blur-md border-b border-landing-muted/20"
+            className="fixed top-0 left-0 right-0 z-overlay hidden md:flex items-center justify-between px-6 py-3 bg-surface/80 backdrop-blur-md border-b border-text-dim/20"
             initial={{ y: -60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -60, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="font-mono text-xs uppercase tracking-widest text-landing-text">
-              Scout<span className="text-landing-muted">Agent</span>
+            <span className="font-mono text-xs uppercase tracking-widest text-text">
+              Scout<span className="text-text-dim">Agent</span>
             </span>
             <Link
               href="/signup"
-              className="font-mono text-xs font-medium bg-landing-signal text-[#0A0A0A] px-4 py-1.5 rounded hover:opacity-90 transition-opacity"
+              className="font-mono text-xs font-medium bg-accent-green text-[#0A0A0A] px-4 py-1.5 rounded hover:opacity-90 transition-opacity"
             >
               Start Free
             </Link>
@@ -55,7 +55,7 @@ export function StickyCta() {
           >
             <Link
               href="/signup"
-              className="font-mono text-xs font-medium bg-landing-signal text-[#0A0A0A] px-5 py-2.5 rounded-full shadow-elevated hover:opacity-90 transition-opacity"
+              className="font-mono text-xs font-medium bg-accent-green text-[#0A0A0A] px-5 py-2.5 rounded-full shadow-elevated hover:opacity-90 transition-opacity"
             >
               Start Free
             </Link>
