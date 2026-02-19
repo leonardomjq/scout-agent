@@ -1,229 +1,209 @@
 # ScoutAgent Design System
 
-Quick-reference for all UI decisions. Consult before writing any new UI code.
+Dark, warm, sophisticated. Teal-green signal accents. Intelligence briefing aesthetic.
 
 ---
 
-## Color Tokens
+## 1. Color Palette
 
-Defined in `app/globals.css` under `@theme`.
+All colors are CSS custom properties defined in `app/globals.css` via `@theme`.
 
-| Token | Value | Usage |
-|---|---|---|
-| `--color-bg` | `#0A0A0A` | Page background |
-| `--color-surface` | `#111111` | Cards, panels, inputs |
-| `--color-surface-elevated` | `#1A1A1A` | Hover states, nested surfaces |
-| `--color-surface-glass` | `rgba(255,255,255,0.03)` | Frosted glass cards (alpha cards, preview) |
-| `--color-border` | `#222222` | All borders |
-| `--color-text` | `#E0E0E0` | Primary text |
-| `--color-text-muted` | `#666666` | Secondary text, labels, captions |
-| `--color-accent-green` | `#00FF88` | Primary accent, CTAs, success |
-| `--color-accent-red` | `#FF3366` | Errors, danger, falling momentum |
-| `--color-accent-amber` | `#FFB800` | Warnings, stable momentum |
-| `--color-accent-blue` | `#00AAFF` | Info, links, momentum shift category |
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `bg` | `#0A0A0A` | Page background |
+| `surface` | `#151515` | Cards, sections, panels |
+| `surface-elevated` | `#1A1A1A` | Hover states, raised elements |
+| `surface-glass` | `rgba(255,255,255,0.03)` | Glass morphism panels |
+| `border` | `#222222` | Default borders |
+| `text` | `#F5F5F0` | Primary text (warm off-white) |
+| `text-muted` | `#8A9EA0` | Secondary text (blue-gray) |
+| `text-dim` | `#525252` | Labels, dividers, timestamps |
+| `accent-green` | `#00E5B3` | Primary accent — signals, CTAs, success |
+| `accent-orange` | `#FF6B35` | Urgency, deadlines, scarcity |
+| `accent-red` | `#FF3366` | Errors, danger, negative signals |
+| `accent-amber` | `#FFB800` | Warnings, caution |
+| `accent-blue` | `#00AAFF` | Info, links, neutral highlights |
 
----
-
-## Typography
-
-Fonts loaded via `next/font/google` in `app/layout.tsx`:
-- **Sans:** Inter (`font-sans`)
-- **Mono:** JetBrains Mono (`font-mono`)
-
-| Role | Classes |
-|---|---|
-| Page title | `text-2xl font-bold` |
-| Section heading | `text-lg font-semibold mb-3` |
-| Card title | `text-lg font-semibold` |
-| Body | `text-sm text-text-muted` |
-| Caption | `text-xs text-text-muted` |
-| Overline | `text-xs font-mono uppercase tracking-wider` |
+Usage: `text-accent-green`, `bg-surface`, `border-text-dim/30`, etc.
 
 ---
 
-## Spacing Rules
+## 2. Typography
+
+Four-font hierarchy loaded via `next/font` in the root layout:
+
+| Role | Font | CSS variable | Usage |
+|------|------|-------------|-------|
+| Display | Space Grotesk | `--font-display` | Headlines, section titles |
+| Body | IBM Plex Serif | `--font-serif` | Paragraphs, descriptions, evidence |
+| Data | JetBrains Mono | system `font-mono` | Labels, badges, stats, code |
+| UI | Inter | system default | Buttons, navigation, form elements |
+
+### Size scale
+- Section label: `text-[10px] font-mono uppercase tracking-widest`
+- Body: `text-sm` (14px)
+- Section heading: `text-2xl sm:text-3xl md:text-4xl font-bold`
+- Hero heading: `text-[2.5rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[6rem]`
+- Stat number: `text-lg font-bold font-mono`
+
+---
+
+## 3. Spacing
+
+Consistent padding/gap patterns:
 
 | Context | Value |
-|---|---|
-| Card padding (compact) | `p-4` — stat boxes, evidence items, inner cards |
-| Card padding (default) | `p-5` — alpha cards, skeletons, general cards |
-| Card padding (spacious) | `p-6` — settings sections, pricing, feature cards, auth forms |
-| Section gap | `space-y-6` |
-| Between cards | `gap-4` |
-| Heading → content | `mb-3` |
+|---------|-------|
+| Section padding | `px-6 py-20` |
+| Card padding (compact) | `p-4` |
+| Card padding (default) | `p-5` |
+| Card padding (spacious) | `p-6` |
+| Grid gap | `gap-6` (cards), `gap-8` (sections) |
+| Element spacing | `mb-2` (tight), `mb-4` (normal), `mb-6` (loose), `mb-12` (section) |
+| Max content width | `max-w-3xl` (narrow), `max-w-4xl` (medium), `max-w-5xl` (wide) |
 
 ---
 
-## Opacity Scale
+## 4. Border Radius
 
-| Opacity | Usage |
-|---|---|
-| `/5` | Subtle background tint (e.g. `bg-accent-green/5`) |
-| `/10` | Tint background (badge bg, status bg) |
-| `/20` | Active/hover background |
-| `/30` | Colored borders |
-| `/40` | Muted colored borders, focus rings |
-| `/60` | Muted text variants |
-| `opacity-50` | Disabled state |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `rounded-sm` | 6px | Badges, tags |
+| `rounded` | 8px | Buttons, inputs |
+| `rounded-lg` | 12px | Cards, panels |
+| `rounded-full` | 9999px | Pills, avatars |
 
 ---
 
-## Border Radius
+## 5. Shadows
 
-| Token | Value | Class | Usage |
-|---|---|---|---|
-| `--radius-sm` | `6px` | `rounded-sm` | Badges (tag shape), small chips |
-| `--radius-DEFAULT` | `8px` | `rounded` | Buttons, inputs, filter pills, toasts |
-| `--radius-lg` | `12px` | `rounded-lg` | Cards, sections, modals |
-| `--radius-full` | `9999px` | `rounded-full` | Avatars, pill badges, icon circles |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `shadow-subtle` | `0 1px 2px rgba(0,0,0,0.4)` | Slight depth |
+| `shadow-elevated` | `0 4px 12px rgba(0,0,0,0.5)` | Floating elements |
+| `shadow-glow` | `0 0 30px -10px rgba(0,229,179,0.15)` | Accent glow (Pro cards, CTAs) |
 
----
-
-## Shadows
-
-| Token | Class | Usage |
-|---|---|---|
-| `--shadow-subtle` | `shadow-subtle` | Subtle depth |
-| `--shadow-elevated` | `shadow-elevated` | Toasts, dropdowns, popovers |
-| `--shadow-glow` | `shadow-glow` | Highlighted pricing card |
+Custom glow: `shadow-[0_0_40px_-10px_rgba(0,229,179,0.15)]` for larger glow radius.
 
 ---
 
-## Z-Index Layers
+## 6. Textures
 
-| Token | Value | Class | Usage |
-|---|---|---|---|
-| `--z-index-sticky` | `30` | `z-sticky` | Sticky header |
-| `--z-index-overlay` | `40` | `z-overlay` | Backdrop overlays |
-| `--z-index-modal` | `50` | `z-modal` | Modals, drawers |
-| `--z-index-toast` | `60` | `z-toast` | Toast notifications |
+Utility classes for subtle background patterns:
+
+| Class | Effect |
+|-------|--------|
+| `texture-graph` | 40px grid lines (0.03 opacity) |
+| `texture-paper` | Horizontal scan lines (0.02 opacity) |
+| `texture-noise` | Fractal noise grain (0.04 opacity) |
+
+Apply to cards and sections for the intelligence-briefing feel. `texture-paper` is most common on landing cards.
 
 ---
 
-## Components
+## 7. Glass Morphism
 
-All UI primitives live in `components/ui/`.
-
-### Button (`components/ui/button.tsx`)
-
-```tsx
-import { Button, ButtonLink } from "@/components/ui/button";
-
-<Button variant="primary" size="md">Click</Button>
-<ButtonLink href="/signup" variant="primary" size="lg">Sign Up</ButtonLink>
+Pattern for elevated surfaces:
+```
+bg-surface-glass backdrop-blur-xl border border-border
 ```
 
-| Variant | Visual |
-|---|---|
-| `primary` | Green bg, dark text |
-| `secondary` | Surface bg, border, hover elevated |
-| `ghost` | No bg, muted text, hover text |
-
-| Size | Padding |
-|---|---|
-| `sm` | `px-3 py-1.5 text-xs` |
-| `md` | `px-6 py-2 text-sm` |
-| `lg` | `px-8 py-3 text-lg` |
-
-### Card (`components/ui/card.tsx`)
-
-```tsx
-import { Card } from "@/components/ui/card";
-
-<Card variant="default" padding="default">Content</Card>
-<Card variant="glass" padding="compact">Frosted content</Card>
+For sticky nav/overlays:
 ```
-
-| Variant | Visual |
-|---|---|
-| `default` | Surface bg, border |
-| `glass` | Frosted glass bg, backdrop-blur, border |
-
-| Padding | Value | Usage |
-|---|---|---|
-| `compact` | `p-4` | Stat boxes, evidence, inner cards |
-| `default` | `p-5` | Alpha cards, skeletons |
-| `spacious` | `p-6` | Settings, pricing, features, auth |
-
-### Badge (`components/ui/badge.tsx`)
-
-```tsx
-import { Badge } from "@/components/ui/badge";
-
-<Badge variant="success" shape="pill">Rising</Badge>
-<Badge variant="default" shape="tag">drizzle-orm</Badge>
-```
-
-| Variant | Color |
-|---|---|
-| `default` | Muted (surface-elevated bg) |
-| `success` | Green |
-| `warning` | Amber |
-| `danger` | Red |
-| `info` | Blue |
-
-| Shape | Radius |
-|---|---|
-| `pill` | `rounded-full` |
-| `tag` | `rounded-sm` |
-
-### Input (`components/ui/input.tsx`)
-
-```tsx
-import { Input } from "@/components/ui/input";
-
-<Input placeholder="Search..." />
-<Input icon={<Search className="size-4" />} placeholder="Search..." />
+bg-surface/80 backdrop-blur-md
 ```
 
 ---
 
-## Animation
+## 8. Motion
 
-Import presets from `lib/motion.ts`. Never write raw `{ opacity: 0, y: 20 }` objects.
+All presets in `lib/motion.ts`. Never inline raw Framer Motion objects.
 
-```tsx
-import { fadeInUp, staggerContainer, staggerItem, viewportFadeIn, DURATION, EASE } from "@/lib/motion";
-
-// Enter animation
-<motion.div {...fadeInUp}>
-
-// Staggered list
-<motion.div variants={staggerContainer} initial="hidden" animate="show">
-  <motion.div variants={staggerItem}>Item</motion.div>
-</motion.div>
-
-// Scroll-triggered
-<motion.div {...viewportFadeIn(0.1)}>
-
-// Custom with tokens
-transition={{ duration: DURATION.normal, ease: EASE.out }}
-```
-
+### Basic
 | Preset | Usage |
-|---|---|
-| `fadeInUp` | Single element enter |
-| `staggerContainer` + `staggerItem` | Lists, hero sections |
-| `viewportFadeIn(delay?)` | Scroll-triggered sections |
+|--------|-------|
+| `fadeInUp` | Simple fade + slide for dashboard elements |
+| `staggerContainer` / `staggerItem` | List animation (hidden/show states) |
+| `viewportFadeIn(delay)` | Scroll-triggered fade with optional delay |
 
-| Duration | Value | Usage |
-|---|---|---|
-| `fast` | 0.15s | Micro-interactions, hover |
-| `normal` | 0.2s | Default transitions |
-| `slow` | 0.4s | Page-level animations |
+### Premium (clip-path reveals)
+| Preset | Usage |
+|--------|-------|
+| `clipRevealStagger` / `clipRevealItem` | Section content reveals (hidden/visible states) |
+| `scanLine` | Horizontal line wipe effect |
 
----
-
-## Focus States
-
-All interactive elements should use `focus-visible:focus-ring` (defined as `@utility` in globals.css) which renders a 2px green outline with 2px offset.
+### Constants
+- `DURATION`: `{ fast: 0.15, normal: 0.2, slow: 0.4 }`
+- `EASE`: `{ out: [0.16, 1, 0.3, 1], inOut: [0.4, 0, 0.2, 1] }`
 
 ---
 
-## Adding New Components
+## 9. Component API
 
-1. Check this doc first — the token/pattern you need likely exists
-2. Use `components/ui/` primitives (Button, Card, Badge, Input)
-3. Use tokens from `@theme` — never hardcode colors, radius, or shadows
-4. Use animation presets from `lib/motion.ts` — never write raw motion objects
-5. Use semantic z-index classes (`z-sticky`, `z-overlay`, `z-modal`, `z-toast`)
+All components in `components/ui/`. Use `cn()` from `@/lib/utils` for class merging.
+
+### Button
+```tsx
+<Button variant="primary|secondary|ghost" size="sm|md|lg" />
+<ButtonLink variant="primary|secondary|ghost" size="sm|md|lg" href="..." />
+```
+
+### Card
+```tsx
+<Card variant="default|glass" padding="compact|default|spacious" />
+```
+
+### Badge
+```tsx
+<Badge variant="default|success|warning|danger|info" shape="pill|tag" />
+```
+
+### Input
+```tsx
+<Input icon={<SearchIcon />} />
+```
+
+---
+
+## 10. Patterns
+
+### Section structure (landing)
+```tsx
+<section className="px-6 py-20 max-w-5xl mx-auto">
+  <div className="font-mono text-[10px] text-text-dim uppercase tracking-widest mb-2">
+    Section Label
+  </div>
+  <h2 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-text mb-4">
+    Headline
+  </h2>
+  <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm mb-12">
+    Description
+  </p>
+  {/* Content */}
+</section>
+```
+
+### Tier gating (blur gate)
+```tsx
+<div className="relative border-t border-text-dim/20">
+  <div className="blur-sm select-none pointer-events-none" aria-hidden>
+    {/* Pro content skeleton */}
+  </div>
+  <div className="absolute inset-0 flex items-center justify-center">
+    {/* Lock + upgrade CTA */}
+  </div>
+</div>
+```
+
+### Responsive breakpoints
+- Mobile-first. `sm:` (640px), `md:` (768px), `lg:` (1024px).
+- Grid: `grid-cols-1 md:grid-cols-2` (pricing), `grid-cols-1 md:grid-cols-3` (steps).
+- Text scale: always include `sm:` and `md:` variants for headlines.
+
+### Z-index layers
+| Token | Value | Usage |
+|-------|-------|-------|
+| `z-sticky` | 30 | Sticky headers |
+| `z-overlay` | 40 | Floating CTAs, overlays |
+| `z-modal` | 50 | Modals, dialogs |
+| `z-toast` | 60 | Toast notifications |

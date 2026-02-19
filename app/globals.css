@@ -2,16 +2,18 @@
 
 @theme {
   --color-bg: #0A0A0A;
-  --color-surface: #111111;
+  --color-surface: #151515;
   --color-surface-elevated: #1A1A1A;
   --color-surface-glass: rgba(255, 255, 255, 0.03);
   --color-border: #222222;
-  --color-text: #E0E0E0;
-  --color-text-muted: #666666;
-  --color-accent-green: #00FF88;
+  --color-text: #F5F5F0;
+  --color-text-muted: #8A9EA0;
+  --color-text-dim: #525252;
+  --color-accent-green: #00E5B3;
   --color-accent-red: #FF3366;
   --color-accent-amber: #FFB800;
   --color-accent-blue: #00AAFF;
+  --color-accent-orange: #FF6B35;
 
   --radius-*: initial;
   --radius-sm: 6px;
@@ -22,7 +24,7 @@
   --shadow-*: initial;
   --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 30px -10px rgba(0, 255, 136, 0.15);
+  --shadow-glow: 0 0 30px -10px rgba(0, 229, 179, 0.15);
 
   --z-index-*: initial;
   --z-index-sticky: 30;
@@ -36,14 +38,6 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Landing page tokens */
-  --color-landing-surface: #151515;
-  --color-landing-signal: #00E5B3;
-  --color-landing-urgency: #FF6B35;
-  --color-landing-text: #F5F5F0;
-  --color-landing-archival: #8A9EA0;
-  --color-landing-muted: #525252;
 }
 
 @utility focus-ring {
