@@ -24,6 +24,15 @@ const teasers: Record<ProField, string> = {
     "Opportunity classification and recommended strategic angle for this market signal",
 };
 
+const valueHooks: Record<ProField, string> = {
+  friction_detail: "Know the exact words your future users are saying.",
+  gap_analysis: "See where demand outpaces supply \u2014 right now.",
+  timing_signal: "This window won\u2019t stay open forever.",
+  competitive_landscape: "Know who\u2019s already building before you start.",
+  risk_factors: "Every opportunity has a kill switch. See this one\u2019s.",
+  opportunity_type: "Your strategic playbook for this market gap.",
+};
+
 interface ProFieldTeaserProps {
   field: ProField;
   onUnlock?: () => void;
@@ -32,7 +41,8 @@ interface ProFieldTeaserProps {
 export function ProFieldTeaser({ field, onUnlock }: ProFieldTeaserProps) {
   return (
     <div className="rounded-lg bg-surface border border-border p-4">
-      <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm mb-3">{teasers[field]}</p>
+      <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm mb-1">{teasers[field]}</p>
+      <p className="font-mono text-accent-green text-xs mb-3">{valueHooks[field]}</p>
       <div className="blur-sm select-none pointer-events-none mb-3" aria-hidden>
         <div className="space-y-2">
           <div className="h-3 bg-surface-elevated rounded w-full" />

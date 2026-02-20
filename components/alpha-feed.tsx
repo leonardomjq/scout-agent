@@ -7,9 +7,9 @@ import { CardSkeleton } from "./card-skeleton";
 import type { AlphaCard as AlphaCardType, AlphaCategory, AlphaDirection, AlphaTier } from "@/types";
 import { useCallback, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search, Zap, Clock, ArrowDownWideNarrow, Lock, Twitter, Github, MessageSquare, RefreshCw } from "lucide-react";
+import { Search, Zap, Clock, ArrowDownWideNarrow, Lock, Twitter, Github, MessageSquare, RefreshCw, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MomentumBadge } from "./momentum-badge";
@@ -199,10 +199,17 @@ export function AlphaFeed() {
       {isLocked && cards.length > 0 && (
         <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-lg bg-surface border border-border text-sm text-text-muted">
           <Lock className="size-3.5 shrink-0" />
-          <span>
-            You&apos;ve browsed {cards.length} opportunities. Pro unlocks full
-            strategy + risk analysis for every one.
+          <span className="flex-1">
+            {cards.length >= 8
+              ? `You keep coming back. ${cards.length} opportunities browsed \u2014 unlock the strategy for all of them.`
+              : cards.length >= 4
+                ? `You\u2019ve browsed ${cards.length} opportunities without the full picture. Strategy, risks, and competitive intel are one click away.`
+                : `You\u2019ve browsed ${cards.length} opportunities. Pro unlocks full strategy + risk analysis for every one.`}
           </span>
+          <ButtonLink href="/settings" size="sm" className="shrink-0 gap-1.5">
+            Upgrade to Pro
+            <ArrowRight className="size-3" />
+          </ButtonLink>
         </div>
       )}
 

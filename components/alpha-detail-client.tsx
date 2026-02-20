@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Clock } from "lucide-react";
+import { Clock, Lock } from "lucide-react";
 import { MomentumBadge } from "@/components/momentum-badge";
 import { InlineUpgradeHint } from "@/components/inline-upgrade-hint";
 import { ProFieldTeaser } from "@/components/pro-field-teaser";
@@ -79,7 +79,21 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
     }
   }, [searchParams, router, cardId]);
 
+  const proSectionsRef = useRef<HTMLDivElement>(null);
+
   const openModal = useCallback((field?: ProField) => {
+    // Respect 30-minute cooldown after "Maybe later" dismiss
+    try {
+      const dismissed = sessionStorage.getItem("upgrade_modal_dismissed");
+      if (dismissed) {
+        const elapsed = Date.now() - Number(dismissed);
+        if (elapsed < 30 * 60 * 1000) {
+          // Scroll to the pro section instead of opening modal
+          proSectionsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+      }
+    } catch {}
     setTriggerField(field);
     setModalOpen(true);
   }, []);
@@ -196,7 +210,14 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
           </section>
 
           {/* Pro-only sections */}
+          {isLocked && (
+            <div className="flex items-center gap-2 text-text-dim font-mono text-xs">
+              <Lock className="size-3.5" />
+              <span>6 Pro sections locked</span>
+            </div>
+          )}
           <motion.div
+            ref={proSectionsRef}
             className="space-y-6"
             variants={showReveal ? clipRevealStagger : undefined}
             initial={showReveal ? "hidden" : undefined}

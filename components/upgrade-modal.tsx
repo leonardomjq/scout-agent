@@ -89,6 +89,12 @@ export function UpgradeModal({
                 </p>
               )}
 
+              {/* Price anchor */}
+              <p className="font-[family-name:var(--font-serif)] text-text-muted text-xs mb-4 leading-relaxed">
+                One competitive intelligence report costs $500+.
+                ScoutAgent delivers fresh ones every 72 hours.
+              </p>
+
               {/* Billing toggle */}
               <div className="flex items-center justify-center gap-1 mb-3">
                 <button
@@ -133,12 +139,21 @@ export function UpgradeModal({
                   : `Unlock This Brief \u2014 $${interval === "annual" ? "24" : "29"}/mo`}
               </Button>
 
-              <p className="text-text-muted text-xs mb-2">
+              <p className="text-text-muted text-xs mb-1">
                 Cancel anytime. 7-day money-back guarantee.
               </p>
 
+              <p className="text-text-dim text-[10px] font-mono mb-3">
+                Join hundreds of founders who stopped scrolling and started shipping.
+              </p>
+
               <button
-                onClick={onClose}
+                onClick={() => {
+                  try {
+                    sessionStorage.setItem("upgrade_modal_dismissed", String(Date.now()));
+                  } catch {}
+                  onClose();
+                }}
                 className="text-text-muted text-xs hover:text-text transition-colors"
               >
                 Maybe later

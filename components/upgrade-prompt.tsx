@@ -22,9 +22,12 @@ export function UpgradePrompt() {
         <span>Pro</span>
       </div>
       <h3 className="font-[family-name:var(--font-display)] font-semibold mb-2">Unlock the Full Brief</h3>
-      <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm mb-4">
+      <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm mb-2">
         See what to build, who you&apos;re up against, and how long the window
         stays open.
+      </p>
+      <p className="text-text-dim text-[10px] font-mono mb-4">
+        Join hundreds of founders who stopped scrolling and started shipping.
       </p>
 
       {/* Billing toggle */}
@@ -68,6 +71,10 @@ export function UpgradePrompt() {
       <Button onClick={redirect} disabled={loading}>
         {loading ? "Loading..." : "Upgrade to Pro"}
       </Button>
+
+      <p className="text-text-muted text-xs mt-3">
+        Cancel anytime. 7-day money-back guarantee.
+      </p>
     </Card>
   );
 }

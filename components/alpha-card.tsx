@@ -2,12 +2,17 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Lock } from "lucide-react";
+import { Clock, Lock } from "lucide-react";
 import { MomentumBadge } from "./momentum-badge";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fadeInUp, DURATION } from "@/lib/motion";
 import type { AlphaCard as AlphaCardType } from "@/types";
+
+function getHoursRemaining(createdAt: string): number {
+  const created = new Date(createdAt).getTime();
+  return Math.max(0, 72 - Math.floor((Date.now() - created) / (1000 * 60 * 60)));
+}
 
 interface AlphaCardProps {
   card: AlphaCardType;
@@ -36,6 +41,9 @@ const statusColors: Record<string, string> = {
 };
 
 export function AlphaCard({ card, isLocked }: AlphaCardProps) {
+  const hoursRemaining = getHoursRemaining(card.created_at);
+  const showUrgency = hoursRemaining > 0 && hoursRemaining < 48;
+
   return (
     <motion.div
       {...fadeInUp}
@@ -85,6 +93,12 @@ export function AlphaCard({ card, isLocked }: AlphaCardProps) {
           <div className="flex items-center justify-between text-xs text-text-muted">
             <span>{card.signal_count} signals</span>
             <div className="flex items-center gap-2">
+              {showUrgency && (
+                <span className="inline-flex items-center gap-1 font-mono text-accent-orange">
+                  <Clock className="size-3" />
+                  {hoursRemaining}h left
+                </span>
+              )}
               {isLocked && (
                 <span className="inline-flex items-center gap-1 font-mono">
                   <Lock className="size-3" />
