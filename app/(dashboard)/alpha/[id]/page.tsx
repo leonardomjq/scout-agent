@@ -5,7 +5,7 @@ import { gateAlphaCard } from "@/lib/refinery/gate";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { AlphaDetailClient } from "@/components/alpha-detail-client";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -15,7 +15,7 @@ export default async function AlphaDetailPage({ params }: Props) {
   const { id } = await params;
 
   const user = await getLoggedInUser();
-  if (!user) notFound();
+  if (!user) redirect("/login");
 
   const { databases } = await createSessionClient();
   const tier = await getUserTier(user.$id, databases);

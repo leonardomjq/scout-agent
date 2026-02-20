@@ -1,18 +1,19 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import Link from "next/link";
 import { Menu } from "lucide-react";
 import { SidebarContent } from "./sidebar-content";
 import { MobileDrawer } from "./mobile-drawer";
+import { UserMenu } from "./user-menu";
 import { Logo } from "@/components/logo";
 
 interface DashboardShellProps {
   children: ReactNode;
   tier?: string;
+  user?: { email: string; name?: string } | null;
 }
 
-export function DashboardShell({ children, tier }: DashboardShellProps) {
+export function DashboardShell({ children, tier, user }: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -30,12 +31,9 @@ export function DashboardShell({ children, tier }: DashboardShellProps) {
           <Logo size="md" href="/feed" />
         </div>
         <div className="flex items-center gap-4">
-          <Link
-            href="/settings"
-            className="text-text-muted hover:text-text text-sm transition-colors hidden lg:block"
-          >
-            Settings
-          </Link>
+          <div className="hidden lg:block">
+            <UserMenu user={user ?? null} tier={tier} />
+          </div>
         </div>
       </header>
 
@@ -46,7 +44,7 @@ export function DashboardShell({ children, tier }: DashboardShellProps) {
         </aside>
 
         {/* Mobile drawer */}
-        <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} tier={tier} />
+        <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} tier={tier} user={user} />
 
         {/* Main content */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main>

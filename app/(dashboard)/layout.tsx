@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { getLoggedInUser } from "@/lib/appwrite/server";
 import { createAdminClient } from "@/lib/appwrite/admin";
 import { getUserTier } from "@/lib/appwrite/helpers";
@@ -10,20 +11,21 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let tier: "free" | "pro" = "free";
+  const user = await getLoggedInUser();
+  if (!user) redirect("/login");
 
+  let tier: "free" | "pro" = "free";
   try {
-    const user = await getLoggedInUser();
-    if (user) {
-      const { databases } = createAdminClient();
-      tier = await getUserTier(user.$id, databases);
-    }
+    const { databases } = createAdminClient();
+    tier = await getUserTier(user.$id, databases);
   } catch {
-    // Fall back to free if user fetch fails
+    // Fall back to free if tier fetch fails
   }
 
+  const userInfo = { email: user.email, name: user.name || undefined };
+
   return (
-    <DashboardShell tier={tier}>
+    <DashboardShell tier={tier} user={userInfo}>
       <Suspense>
         <UpgradeSuccessToast />
       </Suspense>

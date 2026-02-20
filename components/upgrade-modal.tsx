@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useToast } from "@/components/toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useStripeRedirect } from "@/hooks/use-stripe-redirect";
 import type { ProField } from "@/components/pro-field-teaser";
 
 type Interval = "monthly" | "annual";
@@ -36,34 +36,17 @@ export function UpgradeModal({
   triggerField,
   urgencyText,
 }: UpgradeModalProps) {
-  const [loading, setLoading] = useState(false);
   const [interval, setInterval] = useState<Interval>("annual");
-  const { toast } = useToast();
+
+  const returnTo = cardId ? `/alpha/${cardId}` : "/settings";
+  const { redirect: handleUpgrade, loading } = useStripeRedirect(
+    `/api/stripe/checkout?interval=${interval}&returnTo=${encodeURIComponent(returnTo)}`,
+    "Could not start checkout. Please try again."
+  );
 
   const headline = triggerField
     ? fieldHeadlines[triggerField]
     : "Unlock the full opportunity brief";
-
-  async function handleUpgrade() {
-    setLoading(true);
-    try {
-      const returnTo = cardId ? `/alpha/${cardId}` : "/settings";
-      const res = await fetch(
-        `/api/stripe/checkout?interval=${interval}&returnTo=${encodeURIComponent(returnTo)}`,
-        { method: "POST" }
-      );
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        toast("Could not start checkout. Please try again.", "error");
-        setLoading(false);
-      }
-    } catch {
-      toast("Could not start checkout. Please try again.", "error");
-      setLoading(false);
-    }
-  }
 
   return (
     <AnimatePresence>

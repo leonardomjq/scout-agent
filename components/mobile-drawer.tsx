@@ -3,15 +3,18 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { SidebarContent } from "./sidebar-content";
 import { Logo } from "@/components/logo";
-import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { X, LogOut } from "lucide-react";
+import { signOut } from "@/lib/appwrite/auth-actions";
 
 interface MobileDrawerProps {
   open: boolean;
   onClose: () => void;
   tier?: string;
+  user?: { email: string; name?: string } | null;
 }
 
-export function MobileDrawer({ open, onClose, tier }: MobileDrawerProps) {
+export function MobileDrawer({ open, onClose, tier, user }: MobileDrawerProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -47,6 +50,37 @@ export function MobileDrawer({ open, onClose, tier }: MobileDrawerProps) {
             <div className="py-4 flex-1 overflow-y-auto">
               <SidebarContent onNavigate={onClose} tier={tier} />
             </div>
+
+            {/* User section */}
+            {user && (
+              <div className="border-t border-border px-4 py-3">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="size-8 rounded-full bg-accent-green/20 text-accent-green flex items-center justify-center text-sm font-bold font-mono shrink-0">
+                    {user.name ? user.name[0].toUpperCase() : (user.email[0] ?? "?").toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">{user.email}</p>
+                    <Badge
+                      variant={tier === "pro" ? "success" : "default"}
+                      shape="pill"
+                      className="mt-0.5"
+                    >
+                      {tier === "pro" ? "Pro" : "Free"}
+                    </Badge>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    await signOut();
+                    window.location.href = "/";
+                  }}
+                  className="flex items-center gap-2 text-sm text-text-muted hover:text-text transition-colors w-full"
+                >
+                  <LogOut className="size-3.5" />
+                  Sign out
+                </button>
+              </div>
+            )}
           </motion.aside>
         </>
       )}

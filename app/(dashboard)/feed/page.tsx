@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AlphaFeed } from "@/components/alpha-feed";
 
 export default function DashboardPage() {
@@ -9,7 +10,9 @@ export default function DashboardPage() {
           Opportunities detected in the last 72 hours
         </p>
       </div>
-      <AlphaFeed />
+      <Suspense>
+        <AlphaFeed />
+      </Suspense>
     </div>
   );
 }

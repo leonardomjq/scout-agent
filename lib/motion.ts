@@ -35,6 +35,14 @@ export function viewportFadeIn(delay = 0) {
   };
 }
 
+// Dropdown menu
+export const dropdownMenu = {
+  initial: { opacity: 0, y: -4 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -4 },
+  transition: { duration: DURATION.fast, ease: EASE.out },
+};
+
 // Premium presets (clipPath reveals, scan effects)
 export const scanLine: Variants = {
   hidden: { scaleX: 0, originX: 0 },

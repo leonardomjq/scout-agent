@@ -3,8 +3,12 @@ import { redirect } from "next/navigation";
 import { getLoggedInUser, createSessionClient } from "@/lib/appwrite/server";
 import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/collections";
 import { UpgradePrompt } from "@/components/upgrade-prompt";
+import { ManageSubscriptionButton } from "@/components/manage-subscription-button";
+import { ChangePasswordForm } from "@/components/change-password-form";
+import { DeleteAccountButton } from "@/components/delete-account-button";
 
 import { Card } from "@/components/ui/card";
+import { SignOutButton } from "@/components/user-menu";
 import { Check, X } from "lucide-react";
 
 const proFeatures = [
@@ -25,21 +29,14 @@ export default async function SettingsPage() {
 
   const { databases } = await createSessionClient();
 
-  const profile = await databases.getDocument(
-    DATABASE_ID,
-    COLLECTIONS.USER_PROFILES,
-    user.$id
-  );
-
-  const subscriptions = await databases.listDocuments(
-    DATABASE_ID,
-    COLLECTIONS.SUBSCRIPTIONS,
-    [
+  const [profile, subscriptions] = await Promise.all([
+    databases.getDocument(DATABASE_ID, COLLECTIONS.USER_PROFILES, user.$id),
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.SUBSCRIPTIONS, [
       Query.equal("user_id", [user.$id]),
       Query.equal("status", ["active"]),
       Query.limit(1),
-    ]
-  );
+    ]),
+  ]);
 
   const subscription = subscriptions.documents[0] ?? null;
   const planInterval =
@@ -92,6 +89,15 @@ export default async function SettingsPage() {
             <span>{memberSince}</span>
           </div>
         </div>
+        <div className="border-t border-border pt-4 mt-4">
+          <SignOutButton />
+        </div>
+      </Card>
+
+      {/* Security */}
+      <Card padding="spacious" className="mb-6 border-accent-green/30">
+        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-4">Security</h2>
+        <ChangePasswordForm />
       </Card>
 
       {/* Subscription */}
@@ -122,6 +128,9 @@ export default async function SettingsPage() {
                 Subscription will cancel at the end of the current period.
               </p>
             )}
+            <div className="border-t border-border pt-4 mt-2">
+              <ManageSubscriptionButton />
+            </div>
           </div>
         ) : (
           <div>
@@ -136,7 +145,7 @@ export default async function SettingsPage() {
 
       {/* Pro feature comparison — only shown for free users */}
       {tier === "free" && (
-        <Card padding="spacious" className="border-accent-green/30">
+        <Card padding="spacious" className="mb-6 border-accent-green/30">
           <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-1">
             What you get with Pro
           </h2>
@@ -162,6 +171,18 @@ export default async function SettingsPage() {
           </ul>
         </Card>
       )}
+
+      {/* Danger Zone */}
+      <Card padding="spacious" className="border-accent-red/30">
+        <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-2 text-accent-red">
+          Danger Zone
+        </h2>
+        <p className="text-sm text-text-muted mb-4">
+          Permanently delete your account and all associated data. This action
+          cannot be undone.
+        </p>
+        <DeleteAccountButton email={user.email} />
+      </Card>
     </div>
   );
 }

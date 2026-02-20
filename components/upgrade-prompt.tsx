@@ -2,35 +2,18 @@
 
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
-import { useToast } from "./toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useStripeRedirect } from "@/hooks/use-stripe-redirect";
 
 type Interval = "monthly" | "annual";
 
 export function UpgradePrompt() {
-  const [loading, setLoading] = useState(false);
   const [interval, setInterval] = useState<Interval>("annual");
-  const { toast } = useToast();
-
-  async function handleUpgrade() {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/stripe/checkout?interval=${interval}`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        toast("Could not start checkout. Please try again.", "error");
-        setLoading(false);
-      }
-    } catch {
-      toast("Could not start checkout. Please try again.", "error");
-      setLoading(false);
-    }
-  }
+  const { redirect, loading } = useStripeRedirect(
+    `/api/stripe/checkout?interval=${interval}`,
+    "Could not start checkout. Please try again."
+  );
 
   return (
     <Card padding="spacious" className="text-center max-w-sm">
@@ -82,7 +65,7 @@ export function UpgradePrompt() {
         )}
       </div>
 
-      <Button onClick={handleUpgrade} disabled={loading}>
+      <Button onClick={redirect} disabled={loading}>
         {loading ? "Loading..." : "Upgrade to Pro"}
       </Button>
     </Card>
