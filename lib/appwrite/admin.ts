@@ -1,4 +1,4 @@
-import { Client, Databases, Users } from "node-appwrite";
+import { Account, Client, Databases, Users } from "node-appwrite";
 
 let adminClient: Client | null = null;
 
@@ -15,6 +15,7 @@ function getAdminClient(): Client {
 export function createAdminClient() {
   const client = getAdminClient();
   return {
+    account: new Account(client),
     databases: new Databases(client),
     users: new Users(client),
   };

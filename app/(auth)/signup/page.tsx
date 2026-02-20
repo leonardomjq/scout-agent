@@ -10,6 +10,7 @@ import { AuthShell } from "@/components/auth-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import {
   clipRevealStagger,
   clipRevealItem,
@@ -102,6 +103,27 @@ export default function SignupPage() {
           </h1>
         </div>
 
+        <p className="text-xs text-text-dim text-center mb-4">
+          By signing up, you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-text-muted transition-colors">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline hover:text-text-muted transition-colors">
+            Privacy Policy
+          </Link>
+        </p>
+
+        <OAuthButtons />
+
+        <div className="flex items-center gap-3 my-6">
+          <div className="h-px flex-1 bg-border" />
+          <span className="font-mono text-[10px] uppercase tracking-wider text-text-dim">
+            or continue with email
+          </span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm text-text-muted mb-1">
@@ -161,10 +183,6 @@ export default function SignupPage() {
             {loading ? "Creating account..." : "Start Free"}
           </Button>
         </form>
-
-        <p className="font-mono text-[10px] text-text-dim text-center mt-4">
-          No credit card required. Free forever plan.
-        </p>
 
         <p className="text-center text-text-muted text-sm mt-4">
           Already have an account?{" "}
