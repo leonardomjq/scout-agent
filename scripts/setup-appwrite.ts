@@ -222,6 +222,75 @@ async function main() {
   console.log("  Done");
 
   console.log("\nAll collections created successfully!");
+
+  // Seed sample Alpha Cards for onboarding empty state
+  console.log("\nSeeding sample Alpha Cards...");
+  const sampleCards = [
+    {
+      title: "Notion users frustrated with task management — 47% demand spike in alternatives",
+      category: "friction_cluster",
+      entities: ["Notion", "Task Management", "Productivity"],
+      signal_strength: 0.82,
+      direction: "accelerating",
+      signal_count: 34,
+      status: "fresh",
+      freshness_score: 0.95,
+      cluster_id: "sample_notion-task-mgmt",
+      thesis: "A growing cluster of builders are vocal about Notion's limitations for task management. Conversations reveal demand for a focused, lightweight alternative that integrates with existing Notion workspaces.",
+      friction_detail: "Users consistently report: (1) Notion databases are too flexible for simple task tracking, (2) No native time-blocking or calendar integration, (3) Mobile experience is sluggish for quick task capture.",
+      gap_analysis: "Current alternatives (Todoist, Linear, Things) don't offer Notion-level flexibility. The gap is a task manager that thinks in Notion's paradigm but executes like Linear.",
+      timing_signal: "Notion's recent API changes and pricing shifts have accelerated frustration. Window is 3-6 months before a well-funded competitor fills this gap.",
+      risk_factors: ["Notion could ship native improvements", "Linear expanding into this space", "Small TAM if too niche"],
+      evidence: JSON.stringify([
+        { tweet_id: "sample_1", author: "@indie_builder", snippet: "Tried every Notion task setup. They all break after 2 weeks. Need something purpose-built.", relevance: 0.92 },
+        { tweet_id: "sample_2", author: "@ship_daily", snippet: "Why hasn't anyone built a Linear-quality task manager that syncs with Notion?", relevance: 0.87 },
+      ]),
+      competitive_landscape: "Todoist (mature, not Notion-native), Linear (dev-focused), Sunsama (premium pricing, broad scope). None specifically target Notion power users wanting focused task management.",
+      opportunity_type: "tooling_gap",
+    },
+    {
+      title: "AI-native CRM for solo founders — new emergence across Reddit and HN",
+      category: "new_emergence",
+      entities: ["CRM", "AI Agents", "Solo Founders"],
+      signal_strength: 0.74,
+      direction: "new",
+      signal_count: 21,
+      status: "fresh",
+      freshness_score: 0.88,
+      cluster_id: "sample_ai-crm-founders",
+      thesis: "Multiple threads across builder communities point to unmet demand for a CRM built from the ground up with AI — not bolted on. Solo founders want something that does the follow-up work, not just tracks it.",
+      friction_detail: "Key pain points: (1) Traditional CRMs require too much manual data entry, (2) AI add-ons to existing CRMs feel like afterthoughts, (3) Solo founders need a CRM that acts as an assistant, not a database.",
+      gap_analysis: "HubSpot and Salesforce are enterprise-first. Attio and Folk are modern but still manual. No CRM auto-drafts follow-ups, enriches leads from social, or suggests next actions autonomously.",
+      timing_signal: "The AI agent wave has trained users to expect autonomous tools. First mover in AI-native CRM for solo builders captures a loyal niche. Build window: next 6 months.",
+      risk_factors: ["Clay + AI combos may suffice", "Big CRM players adding AI features", "Solo founders may not pay for CRM"],
+      evidence: JSON.stringify([
+        { tweet_id: "sample_3", author: "@saas_founder", snippet: "I don't want to log calls. I want my CRM to listen to the call and tell me what to do next.", relevance: 0.91 },
+        { tweet_id: "sample_4", author: "@hn_commenter", snippet: "Every CRM I've tried assumes I have a sales team. I AM the sales team.", relevance: 0.85 },
+      ]),
+      competitive_landscape: "HubSpot (enterprise), Attio (modern but manual), Folk (lightweight but no AI), Clay (enrichment, not CRM). Gap: an end-to-end AI CRM that does the work.",
+      opportunity_type: "dx_improvement",
+    },
+  ];
+
+  for (const card of sampleCards) {
+    try {
+      await databases.createDocument(
+        DATABASE_ID,
+        "alpha_cards",
+        ID.unique(),
+        card
+      );
+      console.log(`  Sample card created: ${card.title.slice(0, 50)}...`);
+    } catch (e: unknown) {
+      const err = e as { code?: number; message?: string };
+      if (err.code === 409) {
+        console.log(`  Sample card already exists, skipping...`);
+      } else {
+        console.warn(`  Failed to seed sample card:`, err.message ?? e);
+      }
+    }
+  }
+  console.log("  Done");
 }
 
 async function createCollection(

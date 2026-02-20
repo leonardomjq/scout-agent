@@ -13,7 +13,9 @@ import { StickyCta } from "@/components/landing/sticky-cta";
 
 export default async function LandingPage() {
   const user = await getLoggedInUser();
+  // getLoggedInUser() auto-cleans stale cookies when session is expired
   if (user) redirect("/feed");
+
   return (
     <div className="landing-page min-h-screen flex flex-col bg-surface overflow-x-hidden">
       {/* Header */}
