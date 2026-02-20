@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Settings, LogOut } from "lucide-react";
-import { signOut } from "@/lib/appwrite/auth-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { dropdownMenu } from "@/lib/motion";
@@ -60,7 +59,7 @@ export function UserMenu({ user, tier }: UserMenuProps) {
   const initial = getInitials(user);
 
   async function handleSignOut() {
-    await signOut();
+    await fetch("/api/auth/signout", { method: "POST" });
     window.location.href = "/";
   }
 
@@ -123,7 +122,7 @@ export function UserMenu({ user, tier }: UserMenuProps) {
 
 export function SignOutButton({ className }: { className?: string }) {
   async function handleSignOut() {
-    await signOut();
+    await fetch("/api/auth/signout", { method: "POST" });
     window.location.href = "/";
   }
 

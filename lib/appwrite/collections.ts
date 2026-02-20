@@ -15,17 +15,3 @@ export const COLLECTIONS = {
 } as const;
 
 export const SESSION_COOKIE = "scout_session";
-
-export const SESSION_COOKIE_OPTIONS = {
-  path: "/",
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
-  maxAge: 60 * 60 * 24 * 30, // 30 days
-};
-
-export async function setSessionCookie(secret: string): Promise<void> {
-  const { cookies } = await import("next/headers");
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, secret, SESSION_COOKIE_OPTIONS);
-}

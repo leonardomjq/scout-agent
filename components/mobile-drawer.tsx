@@ -5,7 +5,6 @@ import { SidebarContent } from "./sidebar-content";
 import { Logo } from "@/components/logo";
 import { Badge } from "@/components/ui/badge";
 import { X, LogOut } from "lucide-react";
-import { signOut } from "@/lib/appwrite/auth-actions";
 
 interface MobileDrawerProps {
   open: boolean;
@@ -71,7 +70,7 @@ export function MobileDrawer({ open, onClose, tier, user }: MobileDrawerProps) {
                 </div>
                 <button
                   onClick={async () => {
-                    await signOut();
+                    await fetch("/api/auth/signout", { method: "POST" });
                     window.location.href = "/";
                   }}
                   className="flex items-center gap-2 text-sm text-text-muted hover:text-text transition-colors w-full"

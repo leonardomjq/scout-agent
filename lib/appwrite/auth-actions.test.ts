@@ -1,26 +1,37 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// Mock dependencies before importing the module
-const mockSet = vi.fn();
+// ---------------------------------------------------------------------------
+// Mock: next/headers
+// ---------------------------------------------------------------------------
 const mockGet = vi.fn();
-const mockDelete = vi.fn();
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
-    set: mockSet,
+    set: vi.fn(),
     get: mockGet,
-    delete: mockDelete,
+    delete: vi.fn(),
   })),
   headers: vi.fn(async () => ({
     get: vi.fn(() => "127.0.0.1"),
   })),
 }));
 
+// ---------------------------------------------------------------------------
+// Mock: next/navigation — redirect throws NEXT_REDIRECT (like the real one)
+// ---------------------------------------------------------------------------
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn((url: string) => {
+    throw new Error("NEXT_REDIRECT");
+  }),
+}));
+
+// ---------------------------------------------------------------------------
+// Mock: node-appwrite
+// ---------------------------------------------------------------------------
 const mockUpdatePassword = vi.fn();
 const mockGetSession = vi.fn();
 const mockListSessions = vi.fn();
 const mockDeleteSession = vi.fn();
-const mockCreateEmailPasswordSession = vi.fn();
 
 vi.mock("node-appwrite", () => {
   class MockClient {
@@ -33,38 +44,46 @@ vi.mock("node-appwrite", () => {
     getSession = mockGetSession;
     listSessions = mockListSessions;
     deleteSession = mockDeleteSession;
-    createEmailPasswordSession = mockCreateEmailPasswordSession;
   }
   return {
     Client: MockClient,
     Account: MockAccount,
-    ID: { unique: vi.fn(() => "unique-id") },
     OAuthProvider: { Google: "google", Github: "github" },
   };
 });
 
+// ---------------------------------------------------------------------------
+// Mock: rate-limit
+// ---------------------------------------------------------------------------
+const mockCheckRateLimit = vi.fn(async () => ({ allowed: true }));
+
 vi.mock("@/lib/rate-limit", () => ({
-  checkRateLimitAsync: vi.fn(async () => ({ allowed: true })),
+  checkRateLimitAsync: (...args: Parameters<typeof mockCheckRateLimit>) => mockCheckRateLimit(...args),
 }));
+
+// ---------------------------------------------------------------------------
+// Mock: admin client
+// ---------------------------------------------------------------------------
+const mockAdminCreateRecovery = vi.fn();
+const mockAdminUpdateRecovery = vi.fn();
 
 vi.mock("./admin", () => ({
   createAdminClient: vi.fn(() => ({
-    users: { create: vi.fn() },
-    databases: { createDocument: vi.fn() },
-    account: { createRecovery: vi.fn(), updateRecovery: vi.fn() },
+    account: {
+      createRecovery: mockAdminCreateRecovery,
+      updateRecovery: mockAdminUpdateRecovery,
+    },
   })),
 }));
 
-vi.mock("./collections", async (importOriginal) => {
-  const original = await importOriginal<typeof import("./collections")>();
-  return {
-    ...original,
-    setSessionCookie: vi.fn(),
-  };
-});
-
+// ---------------------------------------------------------------------------
+// Import the functions under test AFTER all mocks
+// ---------------------------------------------------------------------------
 import { changePassword } from "./auth-actions";
 
+// ===========================================================================
+// changePassword
+// ===========================================================================
 describe("changePassword", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -114,7 +133,6 @@ describe("changePassword", () => {
     expect(mockDeleteSession).toHaveBeenCalledTimes(2);
     expect(mockDeleteSession).toHaveBeenCalledWith("other-session-1");
     expect(mockDeleteSession).toHaveBeenCalledWith("other-session-2");
-    // Should NOT delete the current session
     expect(mockDeleteSession).not.toHaveBeenCalledWith("current-session-id");
   });
 

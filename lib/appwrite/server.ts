@@ -26,13 +26,18 @@ export const getLoggedInUser = cache(async () => {
   try {
     const { account } = await createSessionClient();
     return await account.get();
-  } catch {
-    // If session cookie exists but Appwrite rejects it, clean up the stale cookie
-    // to prevent redirect loops between middleware and dashboard layout
+  } catch (err) {
     const cookieStore = await cookies();
-    if (cookieStore.get(SESSION_COOKIE)?.value) {
+    const hasSession = !!cookieStore.get(SESSION_COOKIE)?.value;
+
+    if (hasSession) {
+      console.error(
+        "[auth] getLoggedInUser: cookie present but Appwrite rejected it:",
+        err instanceof Error ? err.message : err
+      );
       cookieStore.delete(SESSION_COOKIE);
     }
+
     return null;
   }
 });

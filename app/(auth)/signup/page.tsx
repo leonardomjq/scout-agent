@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
-import { signUpWithEmail } from "@/lib/appwrite/auth-actions";
 import { AuthShell } from "@/components/auth-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -72,23 +70,30 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const result = await signUpWithEmail(email, password);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (result.error) {
-      setError(result.error);
-      setLoading(false);
-      return;
+      if (res.ok) {
+        window.location.href = "/feed";
+        return;
+      }
+
+      const data = await res.json();
+      setError(data.error ?? "Sign up failed");
+    } catch {
+      setError("Something went wrong. Please try again.");
     }
-
-    router.push("/feed");
-    router.refresh();
+    setLoading(false);
   }
 
   return (
