@@ -2,16 +2,17 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Clock, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { MomentumBadge } from "./momentum-badge";
+import { BookmarkButton } from "./bookmark-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fadeInUp, DURATION } from "@/lib/motion";
 import type { AlphaCard as AlphaCardType } from "@/types";
 
-function getHoursRemaining(createdAt: string): number {
+function getHoursAgo(createdAt: string): number {
   const created = new Date(createdAt).getTime();
-  return Math.max(0, 72 - Math.floor((Date.now() - created) / (1000 * 60 * 60)));
+  return Math.floor((Date.now() - created) / (1000 * 60 * 60));
 }
 
 interface AlphaCardProps {
@@ -41,22 +42,23 @@ const statusColors: Record<string, string> = {
 };
 
 export function AlphaCard({ card, isLocked }: AlphaCardProps) {
-  const hoursRemaining = getHoursRemaining(card.created_at);
-  const showUrgency = hoursRemaining > 0 && hoursRemaining < 48;
+  const hoursAgo = getHoursAgo(card.created_at);
 
   return (
     <motion.div
       {...fadeInUp}
-      whileHover={{ scale: 1.02, y: -2 }}
+      whileHover={{ scale: 1.01, y: -2 }}
       transition={{ duration: DURATION.normal }}
+      className="h-full"
     >
-      <Link href={`/alpha/${card.id}`}>
+      <Link href={`/alpha/${card.id}`} className="h-full">
         <Card
           variant="default"
-          className="texture-paper border-accent-green/30 hover:border-accent-green/50 transition-colors cursor-pointer"
+          padding="spacious"
+          className="texture-paper border-accent-green/30 hover:border-accent-green/50 transition-colors cursor-pointer h-full flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start justify-between mb-4">
             <span
               className={`text-[10px] font-mono uppercase tracking-widest ${categoryColors[card.category] ?? "text-text-muted"}`}
             >
@@ -69,12 +71,12 @@ export function AlphaCard({ card, isLocked }: AlphaCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-2 leading-snug">
+          <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-3 leading-snug">
             {card.title}
           </h3>
 
           {/* Entities */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {card.entities.map((entity) => (
               <Badge key={entity} shape="tag">
                 {entity}
@@ -84,25 +86,26 @@ export function AlphaCard({ card, isLocked }: AlphaCardProps) {
 
           {/* Thesis (now free tier) */}
           {card.thesis && (
-            <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm line-clamp-2 mb-3">
+            <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm line-clamp-2 leading-relaxed">
               {card.thesis}
             </p>
           )}
 
+          {/* Spacer */}
+          <div className="flex-1" />
+
           {/* Footer */}
-          <div className="flex items-center justify-between text-xs text-text-muted">
-            <span>{card.signal_count} signals</span>
+          <div className="flex items-center justify-between text-xs text-text-muted pt-3 mt-4 border-t border-text-dim/20">
             <div className="flex items-center gap-2">
-              {showUrgency && (
-                <span className="inline-flex items-center gap-1 font-mono text-accent-orange">
-                  <Clock className="size-3" />
-                  {hoursRemaining}h left
-                </span>
-              )}
+              <span className="font-mono text-text-dim">{hoursAgo}h ago</span>
+              <span>{card.signal_count} signals</span>
+              <BookmarkButton cardId={card.id} />
+            </div>
+            <div className="flex items-center gap-2">
               {isLocked && (
                 <span className="inline-flex items-center gap-1 font-mono">
                   <Lock className="size-3" />
-                  +6 Pro sections
+                  +10 Pro sections
                 </span>
               )}
               <Badge

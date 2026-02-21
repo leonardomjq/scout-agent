@@ -25,6 +25,10 @@ const fullCard: AlphaCard = {
   ],
   competitive_landscape: "Kamal (Rails-centric), Docker Compose, Coolify",
   opportunity_type: "migration_aid",
+  mvp_scope: "A single CLI tool that migrates a Docker Compose setup from K8s to Kamal with one command",
+  monetization_angle: "Usage-based pricing per migration, with a free tier for single-service apps",
+  target_buyer: "DevOps-averse solo founders running 2-5 services on K8s who dread their next kubectl session",
+  distribution_channels: "r/selfhosted, HN Show threads, Docker community Slack, Rails-adjacent Twitter",
   cluster_id: "660e8400-e29b-41d4-a716-446655440000",
 };
 
@@ -39,6 +43,10 @@ describe("gateAlphaCard", () => {
     expect(result.evidence).toEqual(fullCard.evidence);
     expect(result.competitive_landscape).toBe(fullCard.competitive_landscape);
     expect(result.opportunity_type).toBe(fullCard.opportunity_type);
+    expect(result.mvp_scope).toBe(fullCard.mvp_scope);
+    expect(result.monetization_angle).toBe(fullCard.monetization_angle);
+    expect(result.target_buyer).toBe(fullCard.target_buyer);
+    expect(result.distribution_channels).toBe(fullCard.distribution_channels);
   });
 
   it("nullifies pro fields for free tier", () => {
@@ -49,6 +57,10 @@ describe("gateAlphaCard", () => {
     expect(result.risk_factors).toBeNull();
     expect(result.competitive_landscape).toBeNull();
     expect(result.opportunity_type).toBeNull();
+    expect(result.mvp_scope).toBeNull();
+    expect(result.monetization_angle).toBeNull();
+    expect(result.target_buyer).toBeNull();
+    expect(result.distribution_channels).toBeNull();
   });
 
   it("keeps thesis visible for free tier", () => {
@@ -93,6 +105,10 @@ describe("gateAlphaCard", () => {
       evidence: null,
       competitive_landscape: null,
       opportunity_type: null,
+      mvp_scope: null,
+      monetization_angle: null,
+      target_buyer: null,
+      distribution_channels: null,
     };
     const result = gateAlphaCard(nulledCard, "free");
     expect(result.thesis).toBe(fullCard.thesis);

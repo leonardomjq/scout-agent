@@ -12,6 +12,7 @@ export const COLLECTIONS = {
   PIPELINE_LOCKS: "pipeline_locks",
   USER_PROFILES: "user_profiles",
   SUBSCRIPTIONS: "subscriptions",
+  BOOKMARKS: "bookmarks",
 } as const;
 
 export const SESSION_COOKIE = "scout_session";

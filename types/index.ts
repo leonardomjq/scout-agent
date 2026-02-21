@@ -16,6 +16,7 @@ import type {
   DailySnapshotSchema,
 } from "@/schemas/baseline";
 import type { AlphaCardSchema, EvidenceSchema } from "@/schemas/alpha";
+import type { BookmarkSchema } from "@/schemas/bookmark";
 import type {
   LayerResultSchema,
   PipelineRunSchema,
@@ -47,6 +48,9 @@ export type Evidence = z.infer<typeof EvidenceSchema>;
 export type AlphaCategory = AlphaCard["category"];
 export type AlphaDirection = AlphaCard["direction"];
 export type AlphaStatus = AlphaCard["status"];
+
+// Bookmark types
+export type Bookmark = z.infer<typeof BookmarkSchema>;
 
 // Pipeline types
 export type LayerResult = z.infer<typeof LayerResultSchema>;

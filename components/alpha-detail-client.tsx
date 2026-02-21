@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Clock, Lock } from "lucide-react";
+import { Lock, Signal } from "lucide-react";
 import { MomentumBadge } from "@/components/momentum-badge";
+import { BookmarkButton } from "@/components/bookmark-button";
 import { InlineUpgradeHint } from "@/components/inline-upgrade-hint";
 import { ProFieldTeaser } from "@/components/pro-field-teaser";
 import { UpgradeModal } from "@/components/upgrade-modal";
@@ -40,17 +41,30 @@ function getCardAge(createdAt: string): {
   return { hoursAgo, hoursRemaining, level };
 }
 
-function getUrgencyMessage(hoursAgo: number, hoursRemaining: number, level: FreshnessLevel): string | null {
+function getRecencyContext(hoursAgo: number, level: FreshnessLevel): {
+  message: string;
+  className: string;
+  iconClassName: string;
+} {
   if (level === "fresh") {
-    return `Detected ${hoursAgo}h ago. Early window \u2014 full strategy available now.`;
+    return {
+      message: `Signal detected ${hoursAgo}h ago \u2014 early opportunity window`,
+      className: "bg-accent-green/5 border border-accent-green/15",
+      iconClassName: "text-accent-green/70",
+    };
   }
   if (level === "warm") {
-    return `Detected ${hoursAgo}h ago. Window closing \u2014 ${hoursRemaining}h until this brief expires.`;
+    return {
+      message: `Signal detected ${hoursAgo}h ago \u2014 market awareness may be growing`,
+      className: "bg-accent-amber/5 border border-accent-amber/15",
+      iconClassName: "text-accent-amber/70",
+    };
   }
-  if (level === "cold") {
-    return `This opportunity expires in ${hoursRemaining}h. Unlock before it\u2019s gone.`;
-  }
-  return null;
+  return {
+    message: `Signal detected ${hoursAgo}h ago \u2014 verify current conditions before building`,
+    className: "bg-surface border border-border",
+    iconClassName: "text-text-muted",
+  };
 }
 
 interface AlphaDetailClientProps {
@@ -98,13 +112,9 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
     setModalOpen(true);
   }, []);
 
-  // Urgency calculations (free users only)
-  const { hoursAgo, hoursRemaining, level } = getCardAge(card.created_at);
-  const urgencyMessage = isLocked ? getUrgencyMessage(hoursAgo, hoursRemaining, level) : null;
-  const modalUrgencyText =
-    isLocked && level !== "fresh"
-      ? `This brief expires in ${hoursRemaining}h.`
-      : undefined;
+  // Recency context (all users)
+  const { hoursAgo, level } = getCardAge(card.created_at);
+  const recency = getRecencyContext(hoursAgo, level);
 
   // Wrap pro sections for reveal animation
   const proSectionVariants = showReveal ? clipRevealItem : undefined;
@@ -112,10 +122,10 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
         <div>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-accent-amber">
               {categoryLabels[card.category] ?? card.category}
             </span>
@@ -130,7 +140,10 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
               {card.status}
             </Badge>
           </div>
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold">{card.title}</h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold">{card.title}</h1>
+            <BookmarkButton cardId={cardId} size="md" className="mt-1 shrink-0" />
+          </div>
         </div>
 
         {/* Entities */}
@@ -145,44 +158,42 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4">
           <Card padding="compact">
-            <div className="text-text-muted text-xs mb-1">Signals</div>
+            <div className="text-text-muted text-xs font-mono uppercase tracking-wider mb-1.5">Signals</div>
             <div className="text-2xl font-bold font-mono">
               {card.signal_count}
             </div>
           </Card>
           <Card padding="compact">
-            <div className="text-text-muted text-xs mb-1">Strength</div>
+            <div className="text-text-muted text-xs font-mono uppercase tracking-wider mb-1.5">Strength</div>
             <div className="text-2xl font-bold font-mono">
               {Math.round(card.signal_strength * 100)}%
             </div>
           </Card>
           <Card padding="compact">
-            <div className="text-text-muted text-xs mb-1">Freshness</div>
+            <div className="text-text-muted text-xs font-mono uppercase tracking-wider mb-1.5">Freshness</div>
             <div className="text-2xl font-bold font-mono">
               {Math.round(card.freshness_score * 100)}%
             </div>
           </Card>
         </div>
 
-        {/* Urgency banner (free users only) */}
-        {isLocked && urgencyMessage && (
-          <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-accent-orange/5 border border-accent-orange/20 text-sm">
-            <Clock className="size-4 text-accent-orange shrink-0" />
-            <span className="text-text-muted">{urgencyMessage}</span>
-          </div>
-        )}
+        {/* Recency banner (all users) */}
+        <div className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm ${recency.className}`}>
+          <Signal className={`size-4 shrink-0 ${recency.iconClassName}`} />
+          <span className="text-text-muted">{recency.message}</span>
+        </div>
 
         {/* Content sections */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Thesis (free tier) */}
           <section>
-            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Thesis</h2>
+            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Thesis</h2>
             <p className="font-[family-name:var(--font-serif)] text-text-muted leading-relaxed">{card.thesis}</p>
           </section>
 
           {/* Evidence (truncated for free, full for pro) */}
           <section>
-            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Evidence</h2>
+            <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Evidence</h2>
             {card.evidence && card.evidence.length > 0 ? (
               <div className="space-y-3">
                 {card.evidence.map((ev) => (
@@ -213,18 +224,18 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
           {isLocked && (
             <div className="flex items-center gap-2 text-text-dim font-mono text-xs">
               <Lock className="size-3.5" />
-              <span>6 Pro sections locked</span>
+              <span>10 Pro sections locked</span>
             </div>
           )}
           <motion.div
             ref={proSectionsRef}
-            className="space-y-6"
+            className="space-y-8 pt-2"
             variants={showReveal ? clipRevealStagger : undefined}
             initial={showReveal ? "hidden" : undefined}
             animate={showReveal ? "visible" : undefined}
           >
             <ProSection variants={proSectionVariants}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Friction Detail</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Friction Detail</h2>
               {isLocked ? (
                 <ProFieldTeaser field="friction_detail" onUnlock={() => openModal("friction_detail")} />
               ) : card.friction_detail ? (
@@ -235,7 +246,7 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
             </ProSection>
 
             <ProSection variants={proSectionVariants}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Gap Analysis</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Gap Analysis</h2>
               {isLocked ? (
                 <ProFieldTeaser field="gap_analysis" onUnlock={() => openModal("gap_analysis")} />
               ) : card.gap_analysis ? (
@@ -246,7 +257,7 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
             </ProSection>
 
             <ProSection variants={proSectionVariants}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Timing Signal</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Timing Signal</h2>
               {isLocked ? (
                 <ProFieldTeaser field="timing_signal" onUnlock={() => openModal("timing_signal")} />
               ) : card.timing_signal ? (
@@ -257,7 +268,7 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
             </ProSection>
 
             <ProSection variants={proSectionVariants}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Competitive Landscape</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Competitive Landscape</h2>
               {isLocked ? (
                 <ProFieldTeaser field="competitive_landscape" onUnlock={() => openModal("competitive_landscape")} />
               ) : card.competitive_landscape ? (
@@ -268,7 +279,7 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
             </ProSection>
 
             <ProSection variants={proSectionVariants}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Risk Factors</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Risk Factors</h2>
               {isLocked ? (
                 <ProFieldTeaser field="risk_factors" onUnlock={() => openModal("risk_factors")} />
               ) : card.risk_factors ? (
@@ -281,7 +292,7 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
             </ProSection>
 
             <ProSection variants={proSectionVariants}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold mb-3">Opportunity Type</h2>
+              <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Opportunity Type</h2>
               {isLocked ? (
                 <ProFieldTeaser field="opportunity_type" onUnlock={() => openModal("opportunity_type")} />
               ) : card.opportunity_type ? (
@@ -290,6 +301,57 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
                 </Badge>
               ) : null}
             </ProSection>
+
+            {/* Blueprint section — strategic direction */}
+            <div className="border-t border-text-dim/20 pt-8">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-accent-green mb-8">The Blueprint</p>
+
+              <div className="space-y-8">
+                <ProSection variants={proSectionVariants}>
+                  <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">MVP Scope</h2>
+                  {isLocked ? (
+                    <ProFieldTeaser field="mvp_scope" onUnlock={() => openModal("mvp_scope")} />
+                  ) : card.mvp_scope ? (
+                    <p className="font-[family-name:var(--font-serif)] text-text-muted leading-relaxed">
+                      {card.mvp_scope}
+                    </p>
+                  ) : null}
+                </ProSection>
+
+                <ProSection variants={proSectionVariants}>
+                  <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Monetization Angle</h2>
+                  {isLocked ? (
+                    <ProFieldTeaser field="monetization_angle" onUnlock={() => openModal("monetization_angle")} />
+                  ) : card.monetization_angle ? (
+                    <p className="font-[family-name:var(--font-serif)] text-text-muted leading-relaxed">
+                      {card.monetization_angle}
+                    </p>
+                  ) : null}
+                </ProSection>
+
+                <ProSection variants={proSectionVariants}>
+                  <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Target Buyer</h2>
+                  {isLocked ? (
+                    <ProFieldTeaser field="target_buyer" onUnlock={() => openModal("target_buyer")} />
+                  ) : card.target_buyer ? (
+                    <p className="font-[family-name:var(--font-serif)] text-text-muted leading-relaxed">
+                      {card.target_buyer}
+                    </p>
+                  ) : null}
+                </ProSection>
+
+                <ProSection variants={proSectionVariants}>
+                  <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold mb-4">Distribution Channels</h2>
+                  {isLocked ? (
+                    <ProFieldTeaser field="distribution_channels" onUnlock={() => openModal("distribution_channels")} />
+                  ) : card.distribution_channels ? (
+                    <p className="font-[family-name:var(--font-serif)] text-text-muted leading-relaxed">
+                      {card.distribution_channels}
+                    </p>
+                  ) : null}
+                </ProSection>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -302,7 +364,6 @@ export function AlphaDetailClient({ card, cardId, tier }: AlphaDetailClientProps
           cardTitle={card.title}
           cardId={cardId}
           triggerField={triggerField}
-          urgencyText={modalUrgencyText}
         />
       )}
     </>

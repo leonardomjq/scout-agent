@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Zap, Settings, Sparkles } from "lucide-react";
+import { Zap, Bookmark, Activity, Settings, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const links = [
   { href: "/feed", label: "Alpha Feed", icon: Zap },
+  { href: "/saved", label: "Saved", icon: Bookmark },
+  { href: "/pulse", label: "Pulse", icon: Activity, proBadge: true },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -26,6 +29,7 @@ export function SidebarContent({ onNavigate, tier }: SidebarContentProps) {
               ? pathname === "/feed" || pathname.startsWith("/alpha")
               : pathname.startsWith(link.href);
           const Icon = link.icon;
+          const showProBadge = link.proBadge && (!tier || tier === "free");
           return (
             <Link
               key={link.href}
@@ -39,6 +43,11 @@ export function SidebarContent({ onNavigate, tier }: SidebarContentProps) {
             >
               <Icon className="size-4" />
               {link.label}
+              {showProBadge && (
+                <Badge variant="success" shape="pill" className="text-[9px] px-1.5 py-0 ml-auto">
+                  Pro
+                </Badge>
+              )}
             </Link>
           );
         })}
@@ -57,7 +66,7 @@ export function SidebarContent({ onNavigate, tier }: SidebarContentProps) {
               Go Pro
             </div>
             <p className="text-text-muted text-xs">
-              Full briefs for every opportunity.
+              Full briefs, blueprints, and trends.
             </p>
             <p className="text-accent-green text-xs font-mono mt-1">
               $24/mo

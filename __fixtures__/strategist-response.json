@@ -30,5 +30,9 @@
   ],
   "competitive_landscape": "Kamal (Rails-centric, limited to Ruby ecosystem), Docker Compose (manual config, no deployment orchestration), Coolify (self-hosted PaaS, early stage). No tool addresses the K8s migration path specifically.",
   "opportunity_type": "migration_aid",
+  "mvp_scope": "A single CLI tool that migrates a Docker Compose setup from K8s to Kamal with one command — detect services, generate Kamal config, verify connectivity.",
+  "monetization_angle": "Freemium with a free tier for single-service apps and a paid tier ($29/mo) for multi-service setups. Enterprise tier for custom migration consulting.",
+  "target_buyer": "DevOps-averse solo founders and small teams running 2-5 services on K8s who dread their next kubectl session. Triggered by their next unexpected cloud bill.",
+  "distribution_channels": "r/selfhosted, HN Show threads, Docker community Slack, Rails-adjacent Twitter. Partner with Kamal and Coolify communities where migration discussions are happening.",
   "cluster_id": "660e8400-e29b-41d4-a716-446655440000"
 }

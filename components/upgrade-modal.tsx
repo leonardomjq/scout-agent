@@ -17,6 +17,10 @@ const fieldHeadlines: Record<ProField, string> = {
   competitive_landscape: "See who else is building here",
   risk_factors: "See what could kill this opportunity",
   opportunity_type: "See the recommended strategic angle",
+  mvp_scope: "See exactly what to build first",
+  monetization_angle: "See how the money flows",
+  target_buyer: "See who your customer is",
+  distribution_channels: "See where to find your first customers",
 };
 
 interface UpgradeModalProps {
@@ -25,7 +29,6 @@ interface UpgradeModalProps {
   cardTitle?: string;
   cardId?: string;
   triggerField?: ProField;
-  urgencyText?: string;
 }
 
 export function UpgradeModal({
@@ -34,7 +37,6 @@ export function UpgradeModal({
   cardTitle,
   cardId,
   triggerField,
-  urgencyText,
 }: UpgradeModalProps) {
   const [interval, setInterval] = useState<Interval>("annual");
 
@@ -80,12 +82,6 @@ export function UpgradeModal({
               {cardTitle && (
                 <p className="text-accent-green font-mono text-sm mb-4 line-clamp-2">
                   {cardTitle}
-                </p>
-              )}
-
-              {urgencyText && (
-                <p className="text-accent-orange text-xs font-mono mb-3">
-                  {urgencyText}
                 </p>
               )}
 

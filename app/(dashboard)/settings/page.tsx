@@ -16,11 +16,14 @@ const proFeatures = [
   { label: "Momentum scores & direction", free: true },
   { label: "Entity tags", free: true },
   { label: "2 evidence items per card", free: true },
+  { label: "3 saved bookmarks", free: true },
   { label: "Full thesis & strategy", free: false },
   { label: "Full evidence trail", free: false },
-  { label: "Opportunity playbooks", free: false },
   { label: "Competitive landscape & risk factors", free: false },
   { label: "Friction details & opportunity windows", free: false },
+  { label: "The Blueprint — MVP, buyer, monetization, distribution", free: false },
+  { label: "Unlimited bookmarks", free: false },
+  { label: "Pulse — trend overview & week-over-week", free: false },
 ];
 
 export default async function SettingsPage() {

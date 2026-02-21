@@ -7,6 +7,10 @@ const PRO_FIELDS = [
   "risk_factors",
   "competitive_landscape",
   "opportunity_type",
+  "mvp_scope",
+  "monetization_angle",
+  "target_buyer",
+  "distribution_channels",
 ] as const;
 
 /**

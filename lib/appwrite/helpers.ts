@@ -58,6 +58,10 @@ export function documentToAlphaCard(doc: Models.Document): AlphaCard {
     evidence: doc.evidence ? fromJsonString(doc.evidence) : null,
     competitive_landscape: doc.competitive_landscape ?? null,
     opportunity_type: doc.opportunity_type ?? null,
+    mvp_scope: doc.mvp_scope ?? null,
+    monetization_angle: doc.monetization_angle ?? null,
+    target_buyer: doc.target_buyer ?? null,
+    distribution_channels: doc.distribution_channels ?? null,
     cluster_id: doc.cluster_id,
   };
 }

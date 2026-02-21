@@ -147,6 +147,11 @@ async function main() {
   await databases.createStringAttribute(DATABASE_ID, "alpha_cards", "evidence", 1048576, false); // JSON string
   await databases.createStringAttribute(DATABASE_ID, "alpha_cards", "competitive_landscape", 50000, false);
   await databases.createEnumAttribute(DATABASE_ID, "alpha_cards", "opportunity_type", ["tooling_gap", "migration_aid", "dx_improvement", "integration"], false);
+  // Blueprint fields (Pro — strategic direction)
+  await databases.createStringAttribute(DATABASE_ID, "alpha_cards", "mvp_scope", 50000, false);
+  await databases.createStringAttribute(DATABASE_ID, "alpha_cards", "monetization_angle", 50000, false);
+  await databases.createStringAttribute(DATABASE_ID, "alpha_cards", "target_buyer", 50000, false);
+  await databases.createStringAttribute(DATABASE_ID, "alpha_cards", "distribution_channels", 50000, false);
   await waitForAttribute("alpha_cards", "status");
   await waitForAttribute("alpha_cards", "freshness_score");
   await databases.createIndex(DATABASE_ID, "alpha_cards", "idx_status_freshness", IndexType.Key, ["status", "freshness_score"]);
@@ -219,6 +224,17 @@ async function main() {
   await waitForAttribute("subscriptions", "status");
   await databases.createIndex(DATABASE_ID, "subscriptions", "idx_stripe_sub", IndexType.Unique, ["stripe_subscription_id"]);
   await databases.createIndex(DATABASE_ID, "subscriptions", "idx_user_status", IndexType.Key, ["user_id", "status"]);
+  console.log("  Done");
+
+  // ── bookmarks ──
+  console.log("\nCreating bookmarks...");
+  await createCollection("bookmarks", "Bookmarks", []);
+  await databases.createStringAttribute(DATABASE_ID, "bookmarks", "user_id", 255, true);
+  await databases.createStringAttribute(DATABASE_ID, "bookmarks", "card_id", 255, true);
+  await waitForAttribute("bookmarks", "user_id");
+  await waitForAttribute("bookmarks", "card_id");
+  await databases.createIndex(DATABASE_ID, "bookmarks", "idx_user_card", IndexType.Unique, ["user_id", "card_id"]);
+  await databases.createIndex(DATABASE_ID, "bookmarks", "idx_user_id", IndexType.Key, ["user_id"]);
   console.log("  Done");
 
   console.log("\nAll collections created successfully!");

@@ -109,7 +109,7 @@ CRITICAL RULES:
 3. Name specific tools, libraries, and versions when discussing gaps
 4. Quantify: reference actual mention counts, velocity ratios, and baseline comparisons
 5. NEVER invent product names, TAM numbers, pricing strategies, or speculative market sizes
-6. NEVER generate "Build This" blueprints or MVP plans — focus on WHAT is happening and WHY it matters
+6. Blueprint fields (mvp_scope, monetization_angle, target_buyer, distribution_channels) should provide STRATEGIC DIRECTION — not tactical implementation plans. Frame opportunities, not step-by-step instructions. Ground in the evidence.
 
 Categories:
 - velocity_spike: Significant increase in developer discussion volume vs baseline
@@ -137,6 +137,10 @@ Generate a structured Alpha Card with:
 8. Evidence: curate the most relevant tweets (up to 15) with author, snippet, relevance score
 9. Competitive landscape: existing tools/solutions mentioned in the evidence
 10. Opportunity type classification
+11. MVP scope: smallest product that captures this opportunity. One tool, one workflow — not a platform.
+12. Monetization angle: how a builder would charge. Reference evidence about willingness to pay if available.
+13. Target buyer: specific persona, their context, their buying trigger. Beyond the category.
+14. Distribution channels: where buyers gather, how to reach the first 10 customers. Reference evidence sources.
 
 The thesis should be insightful enough that a developer reading just the title + thesis understands the opportunity.`,
     schema: StrategistOutputSchema,
@@ -188,6 +192,10 @@ export async function persistAlphaCard(card: AlphaCard): Promise<void> {
       evidence: card.evidence ? toJsonString(card.evidence) : null,
       competitive_landscape: card.competitive_landscape ?? null,
       opportunity_type: card.opportunity_type ?? null,
+      mvp_scope: card.mvp_scope ?? null,
+      monetization_angle: card.monetization_angle ?? null,
+      target_buyer: card.target_buyer ?? null,
+      distribution_channels: card.distribution_channels ?? null,
     }
   );
 }

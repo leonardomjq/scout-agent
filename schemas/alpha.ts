@@ -38,6 +38,12 @@ export const AlphaCardSchema = z.object({
     .enum(["tooling_gap", "migration_aid", "dx_improvement", "integration"])
     .nullable(),
 
+  // === BLUEPRINT (Pro — strategic direction) ===
+  mvp_scope: z.string().nullable(),
+  monetization_angle: z.string().nullable(),
+  target_buyer: z.string().nullable(),
+  distribution_channels: z.string().nullable(),
+
   // === METADATA ===
   cluster_id: z.string().uuid(),
 });

@@ -1,6 +1,6 @@
 /**
  * Dev-only mock Alpha Cards with varied ages to showcase:
- * - Urgency badges (warm/cold cards with <48h remaining)
+ * - Recency indicators (all cards show detection time)
  * - Progressive banner copy (8+ cards triggers strongest copy)
  * - Banner CTA button (free tier)
  *
@@ -14,7 +14,7 @@ function hoursAgo(h: number): string {
 }
 
 export const MOCK_ALPHA_CARDS: AlphaCard[] = [
-  // ── FRESH (6h ago) — no urgency badge ──
+  // ── FRESH (6h ago) ──
   {
     id: "mock-001",
     created_at: hoursAgo(6),
@@ -49,9 +49,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── WARM (28h ago) — urgency badge: ~44h left ──
+  // ── WARM (28h ago) ──
   {
     id: "mock-002",
     created_at: hoursAgo(28),
@@ -80,9 +84,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── COLD (56h ago) — urgency badge: ~16h left ──
+  // ── COLD (56h ago) ──
   {
     id: "mock-003",
     created_at: hoursAgo(56),
@@ -111,9 +119,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── WARM (36h ago) — urgency badge: ~36h left ──
+  // ── WARM (36h ago) ──
   {
     id: "mock-004",
     created_at: hoursAgo(36),
@@ -148,9 +160,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── FRESH (3h ago) — no urgency badge ──
+  // ── FRESH (3h ago) ──
   {
     id: "mock-005",
     created_at: hoursAgo(3),
@@ -179,11 +195,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── WARM (18h ago) — urgency badge: ~54h left → actually 54 > 48, no badge ──
-  // Correction: 72-18 = 54, which is > 48, so NO urgency badge. Let me adjust.
-  // Changed to 26h ago → 72-26 = 46h remaining → shows badge
+  // ── WARM (26h ago) ──
   {
     id: "mock-006",
     created_at: hoursAgo(26),
@@ -218,9 +236,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── WARM (40h ago) — urgency badge: ~32h left ──
+  // ── WARM (40h ago) ──
   {
     id: "mock-007",
     created_at: hoursAgo(40),
@@ -249,9 +271,13 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 
-  // ── COLD (60h ago) — urgency badge: ~12h left ──
+  // ── COLD (60h ago) ──
   {
     id: "mock-008",
     created_at: hoursAgo(60),
@@ -286,5 +312,9 @@ export const MOCK_ALPHA_CARDS: AlphaCard[] = [
     ],
     competitive_landscape: null,
     opportunity_type: null,
+    mvp_scope: null,
+    monetization_angle: null,
+    target_buyer: null,
+    distribution_channels: null,
   },
 ];

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
 import { Check, X } from "lucide-react";
 import Link from "next/link";
 import { clipRevealStagger, clipRevealItem } from "@/lib/motion";
@@ -28,7 +27,7 @@ const faq = [
   {
     question: "What happens if I downgrade?",
     answer:
-      "You keep access to all your existing Alpha Cards, but pro-only fields (strategy, risk factors, opportunity playbooks) become blurred. You can upgrade again anytime to restore full access.",
+      "You keep access to all your existing Alpha Cards, but pro-only fields (strategy, blueprints, risk factors, competitive landscape) become blurred and your bookmarks are capped at 3. You can upgrade again anytime to restore full access.",
   },
 ];
 
@@ -43,8 +42,9 @@ function getPlans(interval: Interval) {
         { label: "Momentum scores & direction", included: true },
         { label: "Entity tags", included: true },
         { label: "2 evidence items per card", included: true },
-        { label: "Full thesis & strategy", included: false },
-        { label: "Opportunity playbooks", included: false },
+        { label: "3 saved bookmarks", included: true },
+        { label: "Full strategy & blueprints", included: false },
+        { label: "Pulse trend overview", included: false },
       ],
       cta: "Start Free — No Credit Card",
       subCta: "Upgrade anytime",
@@ -57,11 +57,11 @@ function getPlans(interval: Interval) {
       period: interval === "annual" ? "/mo billed annually" : "/mo",
       features: [
         { label: "Everything in Free", included: true },
-        { label: "Full thesis & strategy", included: true },
         { label: "Full evidence trail", included: true },
-        { label: "Opportunity playbooks", included: true },
-        { label: "Friction details & opportunity windows", included: true },
         { label: "Competitive landscape & risk factors", included: true },
+        { label: "The Blueprint — MVP, buyer, monetization, distribution", included: true },
+        { label: "Unlimited bookmarks", included: true },
+        { label: "Pulse — trends & week-over-week momentum", included: true },
       ],
       cta: "Start Pro — 7 Day Guarantee",
       subCta: "Full refund, no questions asked",
@@ -208,23 +208,43 @@ export function Pricing() {
         </h3>
         <div className="space-y-0 border-t border-text-dim/20">
           {faq.map((item) => (
-            <details
-              key={item.question}
-              className="group border-b border-text-dim/20"
-            >
-              <summary className="flex items-center justify-between py-4 cursor-pointer font-mono text-sm text-text hover:text-accent-green transition-colors list-none [&::-webkit-details-marker]:hidden">
-                {item.question}
-                <span className="text-text-dim group-open:rotate-45 transition-transform text-lg leading-none">
-                  +
-                </span>
-              </summary>
-              <p className="font-[family-name:var(--font-serif)] text-sm text-text-muted leading-relaxed pb-4">
-                {item.answer}
-              </p>
-            </details>
+            <FaqItem key={item.question} question={item.question} answer={item.answer} />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="border-b border-text-dim/20">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex items-center justify-between w-full py-4 font-mono text-sm text-text hover:text-accent-green transition-colors text-left"
+      >
+        {question}
+        <span
+          className={`text-text-dim text-lg leading-none transition-transform duration-200 shrink-0 ml-4 ${
+            open ? "rotate-45" : ""
+          }`}
+        >
+          +
+        </span>
+      </button>
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <p className="font-[family-name:var(--font-serif)] text-sm text-text-muted leading-relaxed pb-4">
+            {answer}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
