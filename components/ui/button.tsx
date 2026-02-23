@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const variantClasses = {
   primary:
-    "bg-accent-green text-bg font-medium hover:opacity-90 transition-opacity disabled:opacity-50",
+    "bg-accent text-bg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50",
   secondary:
     "bg-surface border border-border hover:bg-surface-elevated transition-colors disabled:opacity-50",
   ghost: "text-text-muted hover:text-text transition-colors",
@@ -16,7 +16,7 @@ const sizeClasses = {
 } as const;
 
 const baseClasses =
-  "rounded focus-visible:focus-ring inline-flex items-center justify-center gap-2 font-mono";
+  "rounded focus-visible:focus-ring inline-flex items-center justify-center gap-2 font-mono cursor-pointer";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

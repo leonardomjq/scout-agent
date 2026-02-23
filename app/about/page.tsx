@@ -12,7 +12,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold mb-10">
           About Scout Daily
         </h1>
@@ -23,7 +23,7 @@ export default function AboutPage() {
               What this is
             </h2>
             <p className="font-[family-name:var(--font-serif)] text-base leading-relaxed text-text-muted">
-              Scout Daily publishes 5-7 opportunity briefs every morning, synthesized from
+              Scout Daily publishes opportunity briefs every morning, synthesized from
               thousands of conversations across Hacker News, Reddit, GitHub, and Product Hunt.
               Each brief identifies a demand spike, frustration cluster, or emerging gap
               where builders could ship something useful.
@@ -57,28 +57,28 @@ export default function AboutPage() {
             </h2>
             <ol className="space-y-3 text-text-muted text-sm">
               <li className="flex gap-3">
-                <span className="font-mono text-accent-green shrink-0">01</span>
+                <span className="font-mono text-accent shrink-0">01</span>
                 <span>
                   Every morning, a script fetches signals from all four sources via their
                   public APIs and feeds.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="font-mono text-accent-green shrink-0">02</span>
+                <span className="font-mono text-accent shrink-0">02</span>
                 <span>
                   Signals are clustered by keyword overlap to identify themes with
                   significant engagement.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="font-mono text-accent-green shrink-0">03</span>
+                <span className="font-mono text-accent shrink-0">03</span>
                 <span>
                   Each cluster is synthesized into an opportunity brief using Gemini Flash,
                   grounded in the actual evidence.
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="font-mono text-accent-green shrink-0">04</span>
+                <span className="font-mono text-accent shrink-0">04</span>
                 <span>
                   Cards are validated, committed to the repo, and auto-deployed to this site.
                 </span>
@@ -108,7 +108,7 @@ export default function AboutPage() {
                 href="https://github.com/leonardomjq"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text hover:text-accent-green transition-colors underline underline-offset-2"
+                className="text-text hover:text-accent transition-colors underline underline-offset-2"
               >
                 Leonardo Jaques
               </a>
@@ -117,7 +117,7 @@ export default function AboutPage() {
                 href="https://github.com/leonardomjq/scout-agent"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text hover:text-accent-green transition-colors underline underline-offset-2"
+                className="text-text hover:text-accent transition-colors underline underline-offset-2"
               >
                 GitHub repo
               </a>

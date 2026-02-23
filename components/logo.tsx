@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 const sizeClasses = {
   sm: "text-xs",
   md: "text-sm",
+  lg: "text-xl",
 } as const;
 
 interface LogoProps {
@@ -16,12 +17,13 @@ export function Logo({ size = "sm", href, className }: LogoProps) {
   const inner = (
     <span
       className={cn(
-        "font-mono uppercase tracking-widest text-text",
+        "font-mono tracking-widest text-text",
         sizeClasses[size],
         className
       )}
     >
-      Scout<span className="text-text-dim">Daily</span>
+      scout<span className="text-accent">_</span>
+      <span className="text-text-dim">daily</span>
     </span>
   );
 

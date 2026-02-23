@@ -33,13 +33,13 @@ export default async function CardPage({ params }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SiteHeader />
-      <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-12">
+      <SiteHeader date={card.date} />
+      <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <Breadcrumbs
             crumbs={[
               { label: "Home", href: "/" },
-              { label: card.date, href: "/archive" },
+              { label: card.date, href: `/edition/${card.date}` },
               { label: card.title },
             ]}
           />

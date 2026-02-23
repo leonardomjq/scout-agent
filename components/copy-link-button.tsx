@@ -26,7 +26,7 @@ export function CopyLinkButton() {
       title="Copy link"
     >
       {copied ? (
-        <Check className="size-4 text-accent-green" />
+        <Check className="size-4 text-accent" />
       ) : (
         <Link2 className="size-4" />
       )}

@@ -4,9 +4,9 @@ const variantClasses = {
   default:
     "bg-surface-elevated text-text-muted border-border",
   success:
-    "bg-accent-green/10 text-accent-green border-accent-green/30",
+    "bg-signal-high/10 text-signal-high border-signal-high/30",
   warning:
-    "bg-accent-amber/10 text-accent-amber border-accent-amber/30",
+    "bg-signal-medium/10 text-signal-medium border-signal-medium/30",
   danger:
     "bg-accent-red/10 text-accent-red border-accent-red/30",
   info:

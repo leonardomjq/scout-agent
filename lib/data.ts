@@ -40,6 +40,17 @@ export function getCardById(id: string): AlphaCard | null {
   return null;
 }
 
+/** Get adjacent dates for prev/next navigation */
+export function getAdjacentDates(date: string): { prev: string | null; next: string | null } {
+  const dates = getAllDates(); // newest-first
+  const idx = dates.indexOf(date);
+  if (idx === -1) return { prev: null, next: null };
+  return {
+    prev: dates[idx + 1] ?? null,  // older = further in array
+    next: dates[idx - 1] ?? null,  // newer = earlier in array
+  };
+}
+
 /** All cards (for static params generation) */
 export function getAllCards(): AlphaCard[] {
   return getAllDates().flatMap((date) => getDailyData(date)?.cards ?? []);

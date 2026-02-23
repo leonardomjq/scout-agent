@@ -15,10 +15,10 @@ export default function GlobalError({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#0A0A0A",
-          color: "#E5E5E5",
+          backgroundColor: "#1a1614",
+          color: "#f5f0e8",
           fontFamily:
-            "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
+            "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif",
         }}
       >
         <div style={{ textAlign: "center", padding: "2rem" }}>
@@ -28,7 +28,7 @@ export default function GlobalError({
           <p
             style={{
               fontSize: "0.875rem",
-              color: "#A3A3A3",
+              color: "#9a9090",
               marginBottom: "1.5rem",
             }}
           >
@@ -39,10 +39,10 @@ export default function GlobalError({
             style={{
               padding: "0.5rem 1.5rem",
               fontSize: "0.875rem",
-              backgroundColor: "#22C55E",
-              color: "#0A0A0A",
+              backgroundColor: "#c8913a",
+              color: "#1a1614",
               border: "none",
-              borderRadius: "0.375rem",
+              borderRadius: "8px",
               cursor: "pointer",
               fontFamily: "inherit",
             }}

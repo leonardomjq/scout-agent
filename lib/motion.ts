@@ -18,52 +18,25 @@ export const fadeInUp = {
 
 export const staggerContainer: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.15 } },
+  show: { transition: { staggerChildren: 0.05 } },
 };
 
 export const staggerItem: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-export function viewportFadeIn(delay = 0) {
-  return {
-    initial: { opacity: 0, y: 30 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: DURATION.slow, delay },
-  };
-}
-
-// Dropdown menu
-export const dropdownMenu = {
-  initial: { opacity: 0, y: -4 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -4 },
-  transition: { duration: DURATION.fast, ease: EASE.out },
-};
-
-// Premium presets (clipPath reveals, scan effects)
-export const scanLine: Variants = {
-  hidden: { scaleX: 0, originX: 0 },
-  visible: {
-    scaleX: 1,
-    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
-export const clipRevealStagger: Variants = {
+// Card reveal (clip-path inset)
+export const cardRevealStagger: Variants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12 },
-  },
+  show: { transition: { staggerChildren: 0.05 } },
 };
 
-export const clipRevealItem: Variants = {
+export const cardRevealItem: Variants = {
   hidden: { clipPath: "inset(100% 0 0 0)", opacity: 0 },
-  visible: {
+  show: {
     clipPath: "inset(0% 0 0 0)",
     opacity: 1,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
   },
 };

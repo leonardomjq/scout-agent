@@ -1,30 +1,63 @@
 # Scout Daily Design System
 
-Dark, warm, minimal. Teal-green accents. Content-first reading experience.
+Cool dark aesthetic with slate-blue accent. OKLCH color space, flat card system, sidebar layout. Content-first reading experience for builders.
 
 ---
 
 ## 1. Color Palette
 
-All colors are CSS custom properties defined in `app/globals.css` via `@theme`.
+All colors are OKLCH values defined as CSS custom properties in `app/globals.css` via `@theme`.
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `bg` | `#0A0A0A` | Page background |
-| `surface` | `#151515` | Cards, sections, panels |
-| `surface-elevated` | `#1A1A1A` | Hover states, raised elements |
-| `surface-glass` | `rgba(255,255,255,0.03)` | Glass morphism panels |
-| `border` | `#222222` | Default borders |
-| `text` | `#F5F5F0` | Primary text (warm off-white) |
-| `text-muted` | `#8A9EA0` | Secondary text (blue-gray) |
-| `text-dim` | `#525252` | Labels, dividers, timestamps |
-| `accent-green` | `#00E5B3` | Primary accent — signals, CTAs, success |
-| `accent-orange` | `#FF6B35` | Secondary accent, emphasis |
-| `accent-red` | `#FF3366` | Errors, danger, negative signals |
-| `accent-amber` | `#FFB800` | Warnings, caution |
-| `accent-blue` | `#00AAFF` | Info, links, neutral highlights |
+### Backgrounds — warm-shifted dark neutrals
+| Token | OKLCH | Usage |
+|-------|-------|-------|
+| `bg` | `oklch(0.13 0.006 270)` | Page background |
+| `surface` | `oklch(0.18 0.006 270)` | Cards, panels |
+| `surface-elevated` | `oklch(0.22 0.008 270)` | Raised elements (badges) |
+| `surface-inset` | `oklch(0.11 0.005 270)` | Recessed areas (signal bar tracks, opportunity panel) |
 
-Usage: `text-accent-green`, `bg-surface`, `border-text-dim/30`, etc.
+### Borders
+| Token | OKLCH | Usage |
+|-------|-------|-------|
+| `border` | `oklch(0.28 0.006 270)` | Default borders |
+| `border-strong` | `oklch(0.38 0.008 270)` | Hover state borders |
+
+### Text — neutral white
+| Token | OKLCH | Usage |
+|-------|-------|-------|
+| `text` | `oklch(0.95 0.005 270)` | Primary text |
+| `text-muted` | `oklch(0.65 0.01 270)` | Secondary text |
+| `text-dim` | `oklch(0.48 0.008 270)` | Labels, timestamps, attributions |
+
+### Primary accent: Slate blue
+| Token | OKLCH | Usage |
+|-------|-------|-------|
+| `accent` | `oklch(0.65 0.08 240)` | Primary accent — CTAs, logo underscore, step numbers |
+| `accent-hover` | `oklch(0.72 0.07 240)` | Button hover state |
+| `accent-subtle` | `oklch(0.25 0.04 240)` | Tinted backgrounds |
+| `accent-muted` | `oklch(0.50 0.06 240)` | Subdued accent text (header date) |
+
+### Signal confidence — single-hue luminance ramp
+| Token | OKLCH | Usage |
+|-------|-------|-------|
+| `signal-high` | `oklch(0.72 0.08 240)` | Strength 7-10 — bright slate |
+| `signal-medium` | `oklch(0.52 0.06 240)` | Strength 4-6 — muted slate |
+| `signal-low` | `oklch(0.35 0.03 240)` | Strength 1-3 — dim slate |
+
+All three signal levels are the SAME slate-blue hue at different brightness. This encodes magnitude, not categories.
+
+### Source brand colors
+| Token | OKLCH | Usage |
+|-------|-------|-------|
+| `source-hn` | `oklch(0.70 0.18 55)` | Hacker News |
+| `source-reddit` | `oklch(0.65 0.22 30)` | Reddit |
+| `source-github` | `oklch(0.93 0.005 270)` | GitHub (near-white on dark) |
+| `source-ph` | `oklch(0.62 0.17 38)` | Product Hunt |
+
+### Backward-compat accent names
+`accent-green`, `accent-blue` map to the primary `accent` token. `accent-red`, `accent-amber`, `accent-orange` have their own OKLCH values.
+
+Usage: `text-accent`, `bg-signal-high`, `border-l-source-reddit`, `bg-accent-subtle`, etc.
 
 ---
 
@@ -35,32 +68,30 @@ Four-font hierarchy loaded via `next/font` in the root layout:
 | Role | Font | CSS variable | Usage |
 |------|------|-------------|-------|
 | Display | Space Grotesk | `--font-display` | Headlines, section titles |
-| Body | IBM Plex Serif | `--font-serif` | Paragraphs, descriptions, evidence |
-| Data | JetBrains Mono | system `font-mono` | Labels, badges, stats, code |
-| UI | Inter | system default | Buttons, navigation, form elements |
+| Body | IBM Plex Serif | `--font-serif` | Thesis, evidence, descriptions |
+| Data | JetBrains Mono | system `font-mono` | Labels, badges, stats, logo |
+| UI | Inter | system default | Buttons, navigation, body text |
 
 ### Size scale
 - Section label: `text-[10px] font-mono uppercase tracking-widest`
 - Body: `text-sm` (14px)
-- Section heading: `text-2xl sm:text-3xl md:text-4xl font-bold`
-- Hero heading: `text-[2.5rem] sm:text-[3.5rem] md:text-[5rem] lg:text-[6rem]`
-- Stat number: `text-lg font-bold font-mono`
+- Card title: `text-lg font-semibold` (display font)
+- Page heading: `text-2xl sm:text-3xl font-bold`
+- Detail heading: `text-3xl sm:text-4xl font-bold`
 
 ---
 
 ## 3. Spacing
 
-Consistent padding/gap patterns:
-
 | Context | Value |
 |---------|-------|
-| Section padding | `px-6 py-20` |
-| Card padding (compact) | `p-4` |
-| Card padding (default) | `p-5` |
-| Card padding (spacious) | `p-6` |
-| Grid gap | `gap-6` (cards), `gap-8` (sections) |
-| Element spacing | `mb-2` (tight), `mb-4` (normal), `mb-6` (loose), `mb-12` (section) |
-| Max content width | `max-w-3xl` (narrow), `max-w-4xl` (medium), `max-w-5xl` (wide) |
+| Page max-width | `max-w-5xl` (grid layout with sidebar) |
+| Page padding | `px-6 py-8` |
+| Card padding | `p-5` |
+| Card gap | `gap-4` |
+| Grid gap | `gap-8` (between cards column and sidebar) |
+| Section spacing | `space-y-12` |
+| Element spacing | `mb-2` (tight), `mb-4` (normal), `mb-8` (section) |
 
 ---
 
@@ -70,8 +101,8 @@ Consistent padding/gap patterns:
 |-------|-------|-------|
 | `rounded-sm` | 6px | Badges, tags |
 | `rounded` | 8px | Buttons, inputs |
-| `rounded-lg` | 12px | Cards, panels |
-| `rounded-full` | 9999px | Pills, avatars |
+| `rounded-lg` | 8px | Cards, panels |
+| `rounded-full` | 9999px | Pills |
 
 ---
 
@@ -79,39 +110,60 @@ Consistent padding/gap patterns:
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `shadow-subtle` | `0 1px 2px rgba(0,0,0,0.4)` | Slight depth |
-| `shadow-elevated` | `0 4px 12px rgba(0,0,0,0.5)` | Floating elements |
-| `shadow-glow` | `0 0 30px -10px rgba(0,229,179,0.15)` | Accent glow (emphasis, hover states) |
+| `shadow-subtle` | `0 1px 2px rgba(0,0,0,0.3)` | Card hover |
+| `shadow-elevated` | `0 4px 12px rgba(0,0,0,0.4)` | Toasts, floating elements |
 
-Custom glow: `shadow-[0_0_40px_-10px_rgba(0,229,179,0.15)]` for larger glow radius.
-
----
-
-## 6. Textures
-
-Utility classes for subtle background patterns:
-
-| Class | Effect |
-|-------|--------|
-| `texture-graph` | 40px grid lines (0.03 opacity) |
-| `texture-paper` | Horizontal scan lines (0.02 opacity) |
-| `texture-noise` | Fractal noise grain (0.04 opacity) |
-
-Apply to cards and sections for subtle depth. `texture-paper` is most common on content cards.
+No glow shadows. No glass morphism. No textures.
 
 ---
 
-## 7. Glass Morphism
+## 6. Flat Card System
 
-Pattern for elevated surfaces:
-```
-bg-surface-glass backdrop-blur-xl border border-border
-```
+All cards render identically regardless of signal strength. The data speaks — the reader decides what matters.
 
-For sticky nav/overlays:
+### Card treatment (all cards)
+- `bg-surface border border-border p-5 rounded-lg`
+- Signal bar: 1px tall, static width, amber luminance ramp
+- Title: `text-lg` display font
+- Thesis: `text-sm` serif, `line-clamp-3`
+- Evidence teaser: first evidence shown as blockquote on all cards
+- Hover: CSS-only `hover:border-border-strong transition-colors`
+- No gradients, no ambient effects, no visual hierarchy between cards
+
+### Signal bar
+Static `<div>` with inline `width` style (strength * 10%). Color from single-hue luminance ramp (`signal-high`, `signal-medium`, `signal-low`). No animation.
+
+### Feed order
+Cards render in data/pipeline order. No sorting by strength, no separators.
+
+---
+
+## 7. Layout
+
+### Home page — grid with sidebar
 ```
-bg-surface/80 backdrop-blur-md
+max-w-5xl grid-cols-1 lg:grid-cols-[1fr_280px] gap-8
 ```
+- Hero (title + divider) spans full width above grid
+- Left column: CardGrid (stagger-animated list)
+- Right column: Sidebar (sticky on desktop, stacks below on mobile)
+
+### Sidebar sections
+1. Edition — formatted display date
+2. Next Edition (only on latest) — countdown to 8 AM UTC (`next-edition-countdown.tsx`, client component)
+3. Sources — 4 rows with source icon, label, evidence count
+4. Stats — briefs count, evidence count
+5. Get Briefs by Email — email signup form (`email-signup.tsx`, client component)
+6. About blurb + "Learn more" link
+7. Links — GitHub + Ko-fi
+
+### Edition route
+Past editions are accessible at `/edition/[date]` with prev/next navigation (`date-nav.tsx`). Home page (`/`) always shows the latest edition.
+
+Sticky positioning: `lg:sticky lg:top-14 lg:self-start` (applied by parent, not sidebar)
+
+### Card detail
+`max-w-5xl` outer, `max-w-3xl` inner for readability.
 
 ---
 
@@ -119,22 +171,17 @@ bg-surface/80 backdrop-blur-md
 
 All presets in `lib/motion.ts`. Never inline raw Framer Motion objects.
 
-### Basic
 | Preset | Usage |
 |--------|-------|
-| `fadeInUp` | Simple fade + slide for dashboard elements |
-| `staggerContainer` / `staggerItem` | List animation (hidden/show states) |
-| `viewportFadeIn(delay)` | Scroll-triggered fade with optional delay |
-
-### Premium (clip-path reveals)
-| Preset | Usage |
-|--------|-------|
-| `clipRevealStagger` / `clipRevealItem` | Section content reveals (hidden/visible states) |
-| `scanLine` | Horizontal line wipe effect |
+| `fadeInUp` | Header/hero fade + slide |
+| `staggerContainer` / `staggerItem` | Generic list animation |
+| `cardRevealStagger` / `cardRevealItem` | Card list clip-path reveal |
 
 ### Constants
 - `DURATION`: `{ fast: 0.15, normal: 0.2, slow: 0.4 }`
 - `EASE`: `{ out: [0.16, 1, 0.3, 1], inOut: [0.4, 0, 0.2, 1] }`
+
+No scroll-triggered animations. No animated signal bars. Content loads immediately.
 
 ---
 
@@ -147,11 +194,13 @@ All components in `components/ui/`. Use `cn()` from `@/lib/utils` for class merg
 <Button variant="primary|secondary|ghost" size="sm|md|lg" />
 <ButtonLink variant="primary|secondary|ghost" size="sm|md|lg" href="..." />
 ```
+Primary = slate-blue button (`bg-accent text-bg`).
 
 ### Card
 ```tsx
-<Card variant="default|glass" padding="compact|default|spacious" />
+<Card padding="compact|default|spacious" />
 ```
+`bg-surface border border-border rounded-lg`
 
 ### Badge
 ```tsx
@@ -162,36 +211,31 @@ All components in `components/ui/`. Use `cn()` from `@/lib/utils` for class merg
 ```tsx
 <Input icon={<SearchIcon />} />
 ```
+Focus: `border-accent/40`
 
 ---
 
 ## 10. Patterns
 
-### Section structure (landing)
-```tsx
-<section className="px-6 py-20 max-w-5xl mx-auto">
-  <div className="font-mono text-[10px] text-text-dim uppercase tracking-widest mb-2">
-    Section Label
-  </div>
-  <h2 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-bold text-text mb-4">
-    Headline
-  </h2>
-  <p className="font-[family-name:var(--font-serif)] text-text-muted text-sm mb-12">
-    Description
-  </p>
-  {/* Content */}
-</section>
-```
+### Logo
+Lowercase `scout_daily` — underscore in `text-accent`, "daily" in `text-text-dim`. Font: mono.
 
-### Responsive breakpoints
-- Mobile-first. `sm:` (640px), `md:` (768px), `lg:` (1024px).
-- Grid: `grid-cols-1 md:grid-cols-2` (pricing), `grid-cols-1 md:grid-cols-3` (steps).
-- Text scale: always include `sm:` and `md:` variants for headlines.
+### Sticky header
+```
+bg-bg z-sticky border-b border-border
+```
+Solid background (no blur/opacity). Logo left, date in `text-accent-muted` beside logo, nav right.
+
+### Card detail
+- Thesis rendered as primary text (no box wrapper)
+- Evidence as `<blockquote>` with `border-l-3 border-l-source-*` left borders
+- Opportunity in inset panel (`bg-surface-inset rounded-lg p-6`)
+- Signal bar: full-width, 3px, static, at top below header
 
 ### Z-index layers
 | Token | Value | Usage |
 |-------|-------|-------|
-| `z-sticky` | 30 | Sticky headers |
-| `z-overlay` | 40 | Floating CTAs, overlays |
-| `z-modal` | 50 | Modals, dialogs |
+| `z-sticky` | 30 | Sticky header |
+| `z-overlay` | 40 | Floating CTAs |
+| `z-modal` | 50 | Modals |
 | `z-toast` | 60 | Toast notifications |

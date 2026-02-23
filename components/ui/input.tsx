@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const inputClasses =
-  "w-full bg-bg border border-border rounded px-3 py-2 text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:border-accent-green/40 transition-colors";
+  "w-full bg-bg border border-border rounded px-3 py-2 text-sm text-text placeholder:text-text-muted/60 focus:outline-none focus:border-accent/40 transition-colors";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

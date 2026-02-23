@@ -53,12 +53,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className={`flex items-center gap-3 px-4 py-3 rounded border shadow-elevated backdrop-blur-md min-w-[280px] max-w-[400px] ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-elevated bg-surface min-w-[280px] max-w-[400px] ${
                 t.variant === "success"
-                  ? "bg-accent-green/10 border-accent-green/30 text-accent-green"
+                  ? "border-signal-high/30 text-signal-high"
                   : t.variant === "error"
-                    ? "bg-accent-red/10 border-accent-red/30 text-accent-red"
-                    : "bg-accent-blue/10 border-accent-blue/30 text-accent-blue"
+                    ? "border-accent-red/30 text-accent-red"
+                    : "border-accent-blue/30 text-accent-blue"
               }`}
             >
               {t.variant === "success" ? (
@@ -71,7 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <span className="text-sm flex-1">{t.message}</span>
               <button
                 onClick={() => dismiss(t.id)}
-                className="shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+                className="shrink-0 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
               >
                 <X className="size-3.5" />
               </button>

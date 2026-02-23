@@ -1,6 +1,9 @@
 # raw signals (temp file, regenerated daily)
 data/signals-raw.json
 
+# subscriber emails (private, not committed)
+data/subscribers.json
+
 # dependencies
 /node_modules
 /.pnp
