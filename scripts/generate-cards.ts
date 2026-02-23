@@ -96,7 +96,21 @@ interface Cluster {
   totalEngagement: number;
 }
 
-function clusterSignals(signals: RawSignal[], maxClusters: number): Cluster[] {
+/** Source diversity multiplier for composite cluster scoring */
+const SOURCE_DIVERSITY_MULTIPLIER: Record<number, number> = {
+  1: 1.0,
+  2: 1.3,
+  3: 1.6,
+  4: 2.0,
+};
+
+function getClusterScore(cluster: Cluster): number {
+  const uniqueSources = new Set(cluster.signals.map((s) => s.source_type)).size;
+  const multiplier = SOURCE_DIVERSITY_MULTIPLIER[uniqueSources] ?? 2.0;
+  return cluster.totalEngagement * multiplier;
+}
+
+function clusterSignals(signals: RawSignal[]): Cluster[] {
   const clusters: Cluster[] = [];
   const assigned = new Set<number>();
 
@@ -136,10 +150,8 @@ function clusterSignals(signals: RawSignal[], maxClusters: number): Cluster[] {
     }
   }
 
-  // Sort by total engagement, take top N
-  return clusters
-    .sort((a, b) => b.totalEngagement - a.totalEngagement)
-    .slice(0, maxClusters);
+  // Sort by composite score (engagement × source diversity multiplier)
+  return clusters.sort((a, b) => getClusterScore(b) - getClusterScore(a));
 }
 
 // ── Gemini generation ──
@@ -155,9 +167,18 @@ CRITICAL RULES:
 4. Reference actual engagement numbers from the data
 5. NEVER invent product names, TAM numbers, or speculative market sizes
 6. The thesis should be insightful enough that someone reading just the title + thesis understands the opportunity
-7. Keep tone informational and evidence-grounded — not sales-y`;
+7. Keep tone informational and evidence-grounded — not sales-y. The opportunity section should read like analysis, not like a pitch deck.
+8. Choose the analytical angle that best fits the evidence. Some opportunities are about market gaps; others about timing, distribution, competitive positioning, or counterintuitive insights. The opportunity section should add information the reader wouldn't get from the evidence alone — not restate what to build.`;
 
 function buildPrompt(cluster: Cluster): string {
+  // Build cluster summary for model context
+  const sourceCounts = cluster.signals.reduce<Record<string, number>>((acc, s) => {
+    acc[s.source_type] = (acc[s.source_type] ?? 0) + 1;
+    return acc;
+  }, {});
+  const sourceStr = Object.entries(sourceCounts).map(([k, v]) => `${k}: ${v}`).join(", ");
+  const clusterSummary = `CLUSTER: ${cluster.signals.length} signals from ${Object.keys(sourceCounts).length} sources (${sourceStr})`;
+
   const signalTexts = cluster.signals
     .slice(0, 15)
     .map((s) => {
@@ -170,6 +191,8 @@ function buildPrompt(cluster: Cluster): string {
 
   return `Based on these signals from developer communities, generate an opportunity brief.
 
+${clusterSummary}
+
 SIGNALS:
 ${signalTexts}
 
@@ -179,7 +202,7 @@ Respond with a JSON object (no markdown fences) with these fields:
 - "thesis": string — 2-3 sentences explaining WHY this signal matters, referencing the data
 - "signal_strength": number — 1-10 based on engagement volume and signal clarity
 - "evidence": array of objects with { "text": string (quote/paraphrase), "source": "hackernews"|"reddit"|"github"|"producthunt", "url": string (if available), "engagement": number }. Include 3-5 most relevant pieces.
-- "opportunity": string — 2-3 sentences on what a builder could ship, how to monetize, and who the buyer is
+- "opportunity": string — The most actionable, non-obvious insight for a builder examining these signals. This is NOT a business plan — it's the one thing the reader wouldn't figure out from the evidence alone. Could be: a market gap nobody's filling, a specific wedge product, a distribution channel that fits this use case, a timing argument, or a contrarian take on why most approaches will fail. Be concrete — name specific tools, audiences, or channels when the evidence supports it. 1-3 sentences. NEVER start with "Build a..."
 - "sources": string[] — unique source types present (e.g., ["hackernews", "reddit"])
 - "signal_count": number — total signals in this cluster`;
 }
@@ -236,6 +259,9 @@ async function generateCard(
 
 // ── Main ──
 
+/** Maximum cards per day — generous ceiling for a daily digest */
+const MAX_CARDS = 12;
+
 async function main() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -252,13 +278,27 @@ async function main() {
   const rawData = JSON.parse(readFileSync(rawPath, "utf-8")) as RawData;
   log(`Loaded ${rawData.signals.length} signals from ${rawData.fetched_at}`);
 
-  // Cluster signals
-  const clusters = clusterSignals(rawData.signals, 7);
-  log(`Found ${clusters.length} clusters`);
+  // Cluster signals — returns all valid clusters sorted by composite score
+  const allClusters = clusterSignals(rawData.signals);
+  log(`Found ${allClusters.length} valid clusters`);
 
-  if (clusters.length === 0) {
+  if (allClusters.length === 0) {
     console.error("Error: No clusters found. Not enough signals to generate cards.");
     process.exit(1);
+  }
+
+  // Take up to MAX_CARDS clusters
+  const clusters = allClusters.slice(0, MAX_CARDS);
+
+  // Log cluster details for observability
+  for (let i = 0; i < clusters.length; i++) {
+    const c = clusters[i];
+    const sources = c.signals.reduce<Record<string, number>>((acc, s) => {
+      acc[s.source_type] = (acc[s.source_type] ?? 0) + 1;
+      return acc;
+    }, {});
+    const sourceStr = Object.entries(sources).map(([k, v]) => `${k}: ${v}`).join(", ");
+    log(`  Cluster ${i + 1}: score=${Math.round(getClusterScore(c))}, signals=${c.signals.length}, sources=[${sourceStr}]`);
   }
 
   // Generate cards
@@ -269,9 +309,17 @@ async function main() {
   for (let i = 0; i < clusters.length; i++) {
     log(`Generating card ${i + 1}/${clusters.length}...`);
     const card = await generateCard(genAI, clusters[i], today, i);
+
     if (card) {
-      cards.push(card);
-      log(`  → "${card.title}" (strength: ${card.signal_strength})`);
+      // Post-generation quality check
+      if (card.evidence.length < 2) {
+        log(`  ⚠ Skipping "${card.title}" — only ${card.evidence.length} evidence item(s)`);
+      } else if (card.thesis.length < 50) {
+        log(`  ⚠ Skipping "${card.title}" — thesis too short (${card.thesis.length} chars)`);
+      } else {
+        cards.push(card);
+        log(`  → "${card.title}" (strength: ${card.signal_strength})`);
+      }
     }
 
     // Rate limit safety: 5s delay between calls (well within 15 RPM free tier)

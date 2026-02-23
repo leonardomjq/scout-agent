@@ -17,7 +17,7 @@ When done making changes, run `pnpm typecheck` to verify.
 
 ## Architecture
 
-Static site with a daily cron pipeline. No database, no auth, no API routes, no payments.
+Static site with a daily cron pipeline. No database, no auth, no payments. One API route (`/api/subscribe`) for email capture.
 
 - **Data source:** JSON files in `data/` directory, committed to the repo
 - **Generation:** Daily GitHub Actions cron (8 AM UTC) runs `scripts/daily.ts` → fetches signals → generates cards via Gemini Flash → commits JSON → Vercel auto-deploys
@@ -29,12 +29,13 @@ Static site with a daily cron pipeline. No database, no auth, no API routes, no 
 - `data/` — Daily card JSON files (`YYYY-MM-DD.json`) and raw signals (`signals-raw.json`)
 - `schemas/card.ts` — Zod schemas (single source of truth for data shapes)
 - `types/index.ts` — Re-exports `z.infer<>` types. Import types from `@/types`, not from schema files.
-- `lib/data.ts` — Data access layer (`getAllDates`, `getDailyData`, `getLatestData`, `getCardById`, `getAllCards`)
+- `lib/data.ts` — Data access layer (`getAllDates`, `getDailyData`, `getLatestData`, `getCardById`, `getAllCards`, `getAdjacentDates`)
 - `lib/motion.ts` — Framer Motion animation presets
 - `lib/utils.ts` — `cn()` utility for Tailwind class merging
-- `components/` — Page components (`alpha-card.tsx`, `card-detail.tsx`, `card-grid.tsx`, `site-header.tsx`, `site-footer.tsx`)
+- `components/` — Page components (`alpha-card.tsx`, `card-detail.tsx`, `card-grid.tsx`, `sidebar.tsx`, `date-nav.tsx`, `next-edition-countdown.tsx`, `email-signup.tsx`, `site-header.tsx`, `site-footer.tsx`)
 - `components/ui/` — Design system primitives (Button, Card, Badge, Input)
-- `app/` — Next.js App Router pages (home, card detail, archive, about, legal)
+- `app/` — Next.js App Router pages (home, edition/[date], card detail, about, legal)
+- `app/api/subscribe/` — Email capture endpoint (POST, stores to `data/subscribers.json`)
 
 ## Daily Pipeline
 
@@ -47,7 +48,7 @@ Three-step flow orchestrated by `scripts/daily.ts`:
    - Product Hunt (Atom feed — daily launches)
    - Output: `data/signals-raw.json`
 
-2. **Generate** (`scripts/generate-cards.ts`) — Clusters signals by keyword overlap (2+ shared keywords), takes top 7 clusters by engagement, synthesizes each into an Alpha Card via Gemini Flash 2.0.
+2. **Generate** (`scripts/generate-cards.ts`) — Clusters signals by keyword overlap (2+ shared keywords), scores clusters by `totalEngagement × sourceDiversityMultiplier`, takes up to 12 top-scoring clusters, synthesizes each into an Alpha Card via Gemini Flash 2.0.
    - Output: `data/YYYY-MM-DD.json`
 
 3. **Deploy** — GitHub Actions commits the new JSON, pushes to main, Vercel auto-deploys.
@@ -101,13 +102,13 @@ The full voice and content guide lives in `.claude/product-marketing-context.md`
 
 **Key rules:**
 - Use "Scout Daily" as subject, not "we"
-- State honest metrics (~250 signals/day, 4 sources, 5-7 cards)
+- State honest metrics (~250 signals/day, 4 sources, typically 3-10 cards)
 - Always attribute AI generation
 - Link evidence to original sources
 - No urgency framing, no FOMO, no exclusivity language
 
-**Words to use:** opportunity, signals, evidence, builders, daily, free, open source
-**Words to avoid:** exclusive, limited, upgrade, subscribe, intelligence, curated, "we"
+**Words to use:** opportunity, signals, evidence, builders, daily, free, open source, sign up, get briefs by email
+**Words to avoid:** exclusive, limited, upgrade, subscribe (in marketing copy), intelligence, curated, "we"
 
 ## Code style
 
@@ -136,9 +137,16 @@ Copy `.env.example` to `.env.local`. Variables:
 
 - **Zod v4** is installed. API is largely compatible with v3 syntax for schemas used here, but check `zod` docs if adding new schema features.
 - **Dark theme is always on** (`class="dark"` on `<html>`). Design tokens defined via CSS `@theme` in `globals.css`, not a Tailwind config file.
+- **Colors use OKLCH color space** — not hex. The cool-dark palette uses `oklch(L C H)` with hue 270 for neutrals and hue 240 for the slate-blue accent. Never hardcode hex colors.
+- **Slate-blue accent, not amber/green** — the primary accent is a muted slate-blue (`--color-accent`). The old `accent-green` and `accent-blue` tokens map to the primary accent for backward compatibility. No amber or green as primary accent.
+- **Flat card system** — all cards render identically regardless of `signal_strength`. Signal strength is displayed as data (number + bar), not as visual hierarchy. No featured tier, no gradients, no sorting by strength.
+- **Signal ramp is single-hue** — `signal-high`, `signal-medium`, `signal-low` are all slate-blue at different luminance. Not a traffic-light system.
 - **HN Algolia API timestamp filter:** Without `numericFilters=created_at_i>`, Ask HN and Show HN return all-time top posts instead of recent ones. Always filter to last 48 hours.
 - **GitHub Search API rate limit:** 10 requests/minute without auth. The fetch script uses 1-second delays between requests.
 - **Reddit requires a User-Agent header.** Requests without one get 429'd. The fetch script sets `ScoutAgent-Experiment/1.0`.
 - **Product Hunt Atom feed HTML entities:** Content contains encoded HTML (`&amp;`, `&lt;`, etc.) that must be decoded before stripping tags.
 - **Gemini free tier rate limit:** 15 requests per minute. The generate script uses 5-second delays between card generation calls.
 - **Data files are committed to the repo.** The `data/` directory contains both `signals-raw.json` (transient, overwritten each run) and `YYYY-MM-DD.json` (permanent daily snapshots).
+- **`data/subscribers.json` is gitignored.** Unlike card data, subscriber emails are private and must not be committed.
+- **The `/api/subscribe` route is the only server-side endpoint.** Everything else is statically generated. This route writes to `data/subscribers.json` on the server filesystem.
+- **Card count is dynamic.** The pipeline publishes 1-12 cards per day depending on signal quality. Clusters are scored by `totalEngagement × sourceDiversityMultiplier` (cross-platform signals rank higher). Do NOT hardcode card count assumptions in UI or copy.
