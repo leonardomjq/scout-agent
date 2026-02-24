@@ -1,8 +1,8 @@
-# Contributing to ScoutAgent
+# Contributing to Scout Daily
 
-Thanks for your interest in contributing! This guide will help you get started.
+Thanks for your interest in contributing! Here's everything you need to get started.
 
-## Development Setup
+## Development setup
 
 ```bash
 # Prerequisites: Node.js >= 22, pnpm >= 10
@@ -12,18 +12,37 @@ git clone https://github.com/leonardomjq/scout-agent.git
 cd scout-agent
 pnpm install
 
-# Set up environment
-cp .env.example .env.local
-# Fill in your keys (see .env.example for details)
-
-# Set up Appwrite database (collections, attributes, indexes)
-npx tsx scripts/setup-appwrite.ts
-
-# Start dev server
+# Start the dev server
 pnpm dev
 ```
 
-## Branch Naming
+That's it — no database setup, no API keys needed for local development. The site renders from JSON files already in the `data/` directory.
+
+### Running the pipeline locally
+
+If you want to fetch fresh signals and generate new cards:
+
+```bash
+cp .env.example .env.local
+# Add your GEMINI_API_KEY to .env.local
+
+pnpm fetch        # Fetch signals → data/signals-raw.json
+pnpm generate     # Generate cards → data/YYYY-MM-DD.json
+pnpm daily        # Or run both steps at once
+```
+
+## Commands
+
+| Command | What it does |
+|---------|-------------|
+| `pnpm dev` | Start dev server (Turbopack) |
+| `pnpm build` | Production build |
+| `pnpm typecheck` | TypeScript type checking (`tsc --noEmit`) |
+| `pnpm fetch` | Fetch signals from HN, Reddit, GitHub, Product Hunt |
+| `pnpm generate` | Generate Alpha Cards from signals via Gemini Flash |
+| `pnpm daily` | Run full pipeline (fetch → generate) |
+
+## Branch naming
 
 Use prefixed branch names:
 
@@ -34,54 +53,50 @@ Use prefixed branch names:
 - `test/description` — test additions or fixes
 - `chore/description` — maintenance tasks
 
-## Commit Messages
+## Commit messages
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat: add demand signals to alpha cards
-fix: correct HMAC timestamp validation window
-docs: update env variable table in README
-test: add pattern matcher edge case coverage
+feat: add source badges to card grid
+fix: handle empty signals array in clustering
+docs: update quickstart instructions
+refactor: extract countdown logic into hook
 ```
 
-## Pull Request Process
+## Pull request process
 
 1. Fork the repo and create your branch from `main`
 2. Make your changes
-3. Ensure all checks pass:
+3. Make sure things still work:
    ```bash
    pnpm typecheck
-   pnpm test
    pnpm build
    ```
-4. Open a PR against `main` using the PR template
-5. Wait for review — maintainers aim to review within 72 hours
+4. Open a PR against `main`
+5. Maintainers aim to review within 72 hours
 
-## Testing Requirements
+## Code style
 
-- New features should include unit tests
-- Bug fixes should include a regression test
-- Run the full suite before submitting:
-  ```bash
-  pnpm test          # Unit tests (Vitest)
-  pnpm test:e2e      # E2E tests (Playwright)
-  ```
+- **File names:** `kebab-case.ts` — components are `PascalCase`, functions/variables are `camelCase`
+- **Imports:** Use `@/` path alias exclusively (maps to project root). Use `import type` for type-only imports.
+- **Components:** Server components by default. Add `"use client"` only when you need browser APIs or interactivity.
+- **Types:** Import from `@/types`, not directly from schema files.
+- **Styling:** Use design tokens from `globals.css` — never hardcode hex colors. Use `cn()` from `@/lib/utils` for class merging.
+- **Animation:** Use presets from `lib/motion.ts` — don't inline raw Framer Motion objects.
+- **Icons:** `lucide-react` only.
 
-## Code Style
+## Architecture notes
 
-- TypeScript strict mode is enabled
-- Zod schemas in `schemas/` are the single source of truth for types
-- Types in `types/index.ts` are re-exported via `z.infer<>`
-- Use `@/*` path aliases for imports
+A few things to know before diving in:
 
-## Architecture Notes
-
-- **Anthropic client** must be lazy-initialized (not top-level) to support test environments
-- **Appwrite JSON fields** are stored as strings — use `toJsonString()`/`fromJsonString()` helpers from `lib/appwrite/helpers.ts`
-- **Tier gating** uses `gateAlphaCard()` from `lib/refinery/gate.ts` — keep it DRY across API routes and server components
-- The pipeline persists state after each layer — partial success is expected
+- **Data lives in JSON files** — the `data/` directory contains daily card files (`YYYY-MM-DD.json`) and raw signals (`signals-raw.json`). No database.
+- **Zod schemas are the source of truth** — defined in `schemas/card.ts`, types re-exported from `types/index.ts` via `z.infer<>`.
+- **Everything is statically generated** except the `/api/subscribe` endpoint (email capture, writes to `data/subscribers.json` which is gitignored).
+- **Dark theme is always on** — `class="dark"` on `<html>`. Colors use OKLCH color space, not hex.
+- **Flat card system** — all cards render identically. Signal strength is displayed as data, not as visual hierarchy. No featured tier.
+- **Card count is dynamic** — the pipeline publishes 1–12 cards per day depending on signal quality. Don't hardcode count assumptions in UI.
 
 ## Questions?
 
-Open a [discussion](https://github.com/leonardomjq/scout-agent/discussions) or reach out in an issue.
+Open an [issue](https://github.com/leonardomjq/scout-agent/issues) or start a [discussion](https://github.com/leonardomjq/scout-agent/discussions).
