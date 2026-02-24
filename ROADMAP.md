@@ -1,87 +1,81 @@
-# ScoutAgent — Product Roadmap
+# Scout Daily — Roadmap
 
-Enhancements to close the gap between "here's a signal" and "here's what to build Monday morning."
-
----
-
-## 1. "Build This" Blueprints ← NEXT
-**Impact: Highest | Effort: Low (L3 prompt + schema fields)**
-
-Each Alpha Card ships with a startup-in-a-box:
-- Concrete product concept (not vague — a specific tool/SaaS idea)
-- Suggested name ideas (LLM-generated)
-- MVP scope (week-by-week buildable plan)
-- Monetization model suggestion
-- Suggested tech stack
-- Estimated TAM from signal volume
-
-Implementation: enhance Strategist (L3) prompt, add fields to `AlphaCardSchema`.
+Ideas for making the daily cards more useful. Roughly ordered by impact and effort.
 
 ---
 
-## 2. Demand Proof — "Someone is literally asking for this"
-**Impact: Very High | Effort: Medium (L1 heuristic + new schema fields)**
+## 1. Weekly Digest Email ← NEXT
+**Impact: High | Effort: Low**
 
-Surface tweets where people explicitly ask for a tool:
+Monday morning email with the strongest cards from the past week. Short, scannable, links back to the site. Good for retention and sharing.
+
+Needs: email service integration (Resend or Postmark), cron job, unsubscribe handling.
+
+---
+
+## 2. More Signal Sources
+**Impact: High | Effort: Medium**
+
+Add sources beyond the current four:
+- **Indie Hackers** — revenue milestones, product launches
+- **Twitter/X** — "I wish there was...", "just launched...", developer chatter
+- **App stores** — trending apps, new categories
+- **Stack Overflow** — questions spiking in volume (signals emerging tooling needs)
+
+Each new source improves cluster quality and cross-platform scoring.
+
+---
+
+## 3. Demand Signals — "Someone is literally asking for this"
+**Impact: High | Effort: Medium**
+
+Surface posts where people explicitly ask for a tool:
 - "Is there a tool that...", "I wish there was...", "I'd pay for..."
-- Attach as "Demand Signals" to each Alpha Card
-- Show actual tweets, follower count, engagement
-- Quantify: "72 developers publicly asked for this in 48h"
+- Attach as evidence to relevant cards
+- Quantify: "47 people publicly asked for this in the last 48 hours"
 
-Implementation: new keyword patterns in scrubber heuristics, new `demand_signals` field on Alpha Cards.
-
----
-
-## 3. Competitor Landscape Auto-Scan
-**Impact: High | Effort: Hard (additional scraping sources)**
-
-Auto-answer "who's already doing this?" for every Alpha Card:
-- Scan Product Hunt, GitHub trending, app stores
-- Show: name, launch date, stars/growth, pricing, weaknesses
-- Flag gaps: "3 competitors exist but none support X"
-
-Implementation: new scraping pipeline (Product Hunt API, GitHub API), new `competitors` field on Alpha Cards.
+Needs: new keyword patterns in the fetch step, new `demand_signals` field on cards.
 
 ---
 
-## 4. Personalized "For You" Scoring
-**Impact: High | Effort: Medium (user preferences + scoring)**
+## 4. Competitor Quick-Scan
+**Impact: Medium | Effort: Medium**
 
-Match opportunities to the individual developer:
-- User sets: tech stack, domain interests, ambition level
-- Personal fit score per Alpha Card: "92% match"
-- Filter feed by buildability
-
-Implementation: `user_preferences` table, scoring function, feed filtering.
+Auto-answer "who's already doing this?" for each card:
+- Scan Product Hunt launches, GitHub trending, app store listings
+- Show: name, launch date, traction, pricing
+- Flag gaps: "3 tools exist but none handle X"
 
 ---
 
-## 5. Weekly "Top Alpha" Digest Email
-**Impact: Medium | Effort: Low (cron + email service)**
+## 5. RSS Feed
+**Impact: Medium | Effort: Low**
 
-Monday morning email with the 3 strongest Alpha Cards of the week:
-- Brief, scannable, links back to app
-- Habit loop for retention
-- Growth channel (forwardable)
-
-Implementation: cron job + Resend/Postmark integration.
+Publish an RSS/Atom feed of daily editions so people can follow via their reader of choice. Straightforward to generate from the existing JSON data at build time.
 
 ---
 
-## 6. Social Proof Loop — "I Built This"
-**Impact: Medium-High | Effort: Hard (community features)**
+## 6. Card Categories & Filtering
+**Impact: Medium | Effort: Low**
+
+Let visitors filter cards by category (ai-tools, making-money, side-projects, etc.) on the home page. Categories already exist in the data — just needs a UI filter.
+
+---
+
+## 7. "I'm Building This" Social Proof
+**Impact: Medium | Effort: Hard**
 
 Long-term flywheel:
-- Users flag "I'm pursuing this Alpha"
-- Track Alpha Cards → Product Hunt launches
-- Surface success stories as marketing
-- Comments/discussions per card
+- Visitors flag "I'm pursuing this opportunity"
+- Track cards that lead to real launches
+- Surface success stories on the site
 
-Implementation: new tables, real-time updates, moderation.
+Needs: some form of lightweight user identity (GitHub OAuth?) and moderation.
 
 ---
 
 ## Priority Order
-`1 → 5 → 2 → 4 → 3 → 6`
 
-Blueprints and digest email are shippable in days. Demand signals next. Personalization and competitor scanning follow as user feedback comes in. Social proof is the long game.
+`1 → 5 → 6 → 2 → 3 → 4 → 7`
+
+Digest email and RSS are shippable in days. Category filtering is low-hanging fruit. New sources and demand signals follow as the pipeline stabilizes. Competitor scanning and social proof are the longer play.
