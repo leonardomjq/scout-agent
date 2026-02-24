@@ -26,6 +26,8 @@ interface RawSignal {
   stars?: number;
   forks?: number;
   url?: string;
+  link_url?: string;
+  homepage_url?: string;
   subreddit?: string;
   maker?: string;
   language?: string | null;
@@ -54,6 +56,27 @@ function getEngagement(signal: RawSignal): number {
     (signal.stars ?? 0) +
     (signal.comment_count ?? 0)
   );
+}
+
+function getSignalUrl(signal: RawSignal): string {
+  // Primary: use url field directly (set by fetch pipeline)
+  if (signal.url) return signal.url;
+
+  // Fallback for older signals-raw.json files without url field
+  switch (signal.source_type) {
+    case "hackernews":
+      return signal.post_id
+        ? `https://news.ycombinator.com/item?id=${signal.post_id}`
+        : "";
+    case "reddit":
+      return signal.subreddit && signal.post_id
+        ? `https://reddit.com/r/${signal.subreddit}/comments/${signal.post_id}/`
+        : "";
+    case "github":
+      return signal.repo ? `https://github.com/${signal.repo}` : "";
+    default:
+      return "";
+  }
 }
 
 function slugify(text: string): string {
@@ -167,8 +190,17 @@ CRITICAL RULES:
 4. Reference actual engagement numbers from the data
 5. NEVER invent product names, TAM numbers, or speculative market sizes
 6. The thesis should be insightful enough that someone reading just the title + thesis understands the opportunity
-7. Keep tone informational and evidence-grounded — not sales-y. The opportunity section should read like analysis, not like a pitch deck.
-8. Choose the analytical angle that best fits the evidence. Some opportunities are about market gaps; others about timing, distribution, competitive positioning, or counterintuitive insights. The opportunity section should add information the reader wouldn't get from the evidence alone — not restate what to build.`;
+7. Keep tone informational and evidence-grounded — not sales-y
+8. Choose the analytical angle that best fits the evidence
+
+OPPORTUNITY FIELD RULES (most important):
+- The ONE non-obvious insight the reader wouldn't get from reading the thread.
+- Must answer: "What changed that created this window, and who specifically should act?"
+- Name a SPECIFIC wedge, channel, or timing angle — not a product category.
+- NEVER start with "Build a..." or "The opportunity is..." — state the insight directly.
+- BAD: "Build an observability layer for AI agent workflows."
+- GOOD: "Langsmith and Helicone cover API-call tracing but not multi-step reasoning replay. The first tool that replays full agent sessions wins the budget DevOps teams already spend on Datadog."
+- Think: what would a sharp, well-connected friend tell you over coffee?`;
 
 function buildPrompt(cluster: Cluster): string {
   // Build cluster summary for model context
@@ -184,7 +216,7 @@ function buildPrompt(cluster: Cluster): string {
     .map((s) => {
       const eng = getEngagement(s);
       const source = s.source_type;
-      const url = s.url ?? (s.repo ? `https://github.com/${s.repo}` : "");
+      const url = getSignalUrl(s);
       return `[${source}] (${eng} engagement${url ? `, ${url}` : ""}) ${s.content.slice(0, 500)}`;
     })
     .join("\n\n");
@@ -202,7 +234,12 @@ Respond with a JSON object (no markdown fences) with these fields:
 - "thesis": string — 2-3 sentences explaining WHY this signal matters, referencing the data
 - "signal_strength": number — 1-10 based on engagement volume and signal clarity
 - "evidence": array of objects with { "text": string (quote/paraphrase), "source": "hackernews"|"reddit"|"github"|"producthunt", "url": string (if available), "engagement": number }. Include 3-5 most relevant pieces.
-- "opportunity": string — The most actionable, non-obvious insight for a builder examining these signals. This is NOT a business plan — it's the one thing the reader wouldn't figure out from the evidence alone. Could be: a market gap nobody's filling, a specific wedge product, a distribution channel that fits this use case, a timing argument, or a contrarian take on why most approaches will fail. Be concrete — name specific tools, audiences, or channels when the evidence supports it. 1-3 sentences. NEVER start with "Build a..."
+- "opportunity": string — The single most non-obvious, actionable insight. Requirements:
+  (a) Name WHO should act (specific audience, not just "builders").
+  (b) Name WHAT changed that created this window.
+  (c) Name a SPECIFIC wedge, channel, or timing angle.
+  (d) NEVER start with "Build a..." or "The opportunity is...".
+  (e) 2-3 sentences. Reads like analysis from a well-connected friend, not a business plan.
 - "sources": string[] — unique source types present (e.g., ["hackernews", "reddit"])
 - "signal_count": number — total signals in this cluster`;
 }
@@ -214,7 +251,7 @@ async function generateCard(
   index: number,
 ): Promise<AlphaCard | null> {
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.7,
@@ -232,6 +269,9 @@ async function generateCard(
     const text = result.response.text();
     const parsed = JSON.parse(text);
 
+    // Track which cluster signals have been matched to evidence items
+    const usedSignalIndices = new Set<number>();
+
     const card: AlphaCard = {
       id: `${date}-${slugify(parsed.title ?? `card-${index}`)}`,
       date,
@@ -239,12 +279,25 @@ async function generateCard(
       category: parsed.category,
       thesis: parsed.thesis,
       signal_strength: Math.min(10, Math.max(1, Math.round(parsed.signal_strength))),
-      evidence: (parsed.evidence ?? []).slice(0, 5).map((ev: Record<string, unknown>) => ({
-        text: String(ev.text ?? ""),
-        source: String(ev.source ?? "hackernews"),
-        url: ev.url ? String(ev.url) : undefined,
-        engagement: Number(ev.engagement ?? 0),
-      })),
+      evidence: (parsed.evidence ?? []).slice(0, 5).map((ev: Record<string, unknown>) => {
+        const source = String(ev.source ?? "hackernews");
+        // Match evidence to a cluster signal by source_type to get the real URL
+        const matchIdx = cluster.signals.findIndex(
+          (s, idx) => s.source_type === source && !usedSignalIndices.has(idx),
+        );
+        let url: string | undefined;
+        if (matchIdx !== -1) {
+          usedSignalIndices.add(matchIdx);
+          const realUrl = getSignalUrl(cluster.signals[matchIdx]);
+          url = realUrl || undefined;
+        }
+        return {
+          text: String(ev.text ?? ""),
+          source,
+          url,
+          engagement: Number(ev.engagement ?? 0),
+        };
+      }),
       opportunity: parsed.opportunity,
       sources: parsed.sources ?? [...new Set(cluster.signals.map((s) => s.source_type))],
       signal_count: parsed.signal_count ?? cluster.signals.length,
@@ -317,12 +370,15 @@ async function main() {
       } else if (card.thesis.length < 50) {
         log(`  ⚠ Skipping "${card.title}" — thesis too short (${card.thesis.length} chars)`);
       } else {
+        if (card.opportunity.startsWith("Build a")) {
+          log(`  ⚠ Opportunity starts with "Build a" — "${card.title}"`);
+        }
         cards.push(card);
         log(`  → "${card.title}" (strength: ${card.signal_strength})`);
       }
     }
 
-    // Rate limit safety: 5s delay between calls (well within 15 RPM free tier)
+    // Rate limit safety: 5s delay between calls (well within 10 RPM free tier)
     if (i < clusters.length - 1) {
       await sleep(5000);
     }

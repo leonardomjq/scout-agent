@@ -48,7 +48,7 @@ Three-step flow orchestrated by `scripts/daily.ts`:
    - Product Hunt (Atom feed — daily launches)
    - Output: `data/signals-raw.json`
 
-2. **Generate** (`scripts/generate-cards.ts`) — Clusters signals by keyword overlap (2+ shared keywords), scores clusters by `totalEngagement × sourceDiversityMultiplier`, takes up to 12 top-scoring clusters, synthesizes each into an Alpha Card via Gemini Flash 2.0.
+2. **Generate** (`scripts/generate-cards.ts`) — Clusters signals by keyword overlap (2+ shared keywords), scores clusters by `totalEngagement × sourceDiversityMultiplier`, takes up to 12 top-scoring clusters, synthesizes each into an Alpha Card via Gemini 2.5 Flash.
    - Output: `data/YYYY-MM-DD.json`
 
 3. **Deploy** — GitHub Actions commits the new JSON, pushes to main, Vercel auto-deploys.
@@ -145,7 +145,7 @@ Copy `.env.example` to `.env.local`. Variables:
 - **GitHub Search API rate limit:** 10 requests/minute without auth. The fetch script uses 1-second delays between requests.
 - **Reddit requires a User-Agent header.** Requests without one get 429'd. The fetch script sets `ScoutAgent-Experiment/1.0`.
 - **Product Hunt Atom feed HTML entities:** Content contains encoded HTML (`&amp;`, `&lt;`, etc.) that must be decoded before stripping tags.
-- **Gemini free tier rate limit:** 15 requests per minute. The generate script uses 5-second delays between card generation calls.
+- **Gemini free tier rate limit:** 10 requests per minute (Gemini 2.5 Flash). The generate script uses 5-second delays between card generation calls.
 - **Data files are committed to the repo.** The `data/` directory contains both `signals-raw.json` (transient, overwritten each run) and `YYYY-MM-DD.json` (permanent daily snapshots).
 - **`data/subscribers.json` is gitignored.** Unlike card data, subscriber emails are private and must not be committed.
 - **The `/api/subscribe` route is the only server-side endpoint.** Everything else is statically generated. This route writes to `data/subscribers.json` on the server filesystem.

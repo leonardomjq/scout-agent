@@ -34,6 +34,8 @@ interface HNSignal {
   timestamp: string;
   points: number;
   comment_count: number;
+  url: string;
+  link_url?: string;
 }
 
 interface RedditSignal {
@@ -43,6 +45,8 @@ interface RedditSignal {
   content: string;
   timestamp: string;
   upvotes: number;
+  url: string;
+  comment_count: number;
 }
 
 interface GitHubSignal {
@@ -54,6 +58,8 @@ interface GitHubSignal {
   forks: number;
   language: string | null;
   topics: string[];
+  url: string;
+  homepage_url?: string;
 }
 
 interface ProductHuntSignal {
@@ -161,6 +167,8 @@ async function fetchHN(): Promise<HNSignal[]> {
         timestamp: new Date(hit.created_at).toISOString(),
         points: hit.points,
         comment_count: hit.num_comments,
+        url: `https://news.ycombinator.com/item?id=${hit.objectID}`,
+        link_url: hit.url || undefined,
       });
     }
 
@@ -208,7 +216,7 @@ async function fetchReddit(): Promise<RedditSignal[]> {
     const data = (await res.json()) as RedditListing;
 
     for (const post of data.data.children) {
-      const { id, title, selftext, ups, created_utc, subreddit, stickied } =
+      const { id, title, selftext, ups, num_comments, created_utc, subreddit, stickied } =
         post.data;
 
       // Skip stickied mod posts
@@ -227,6 +235,8 @@ async function fetchReddit(): Promise<RedditSignal[]> {
         content,
         timestamp: new Date(created_utc * 1000).toISOString(),
         upvotes: ups,
+        url: `https://reddit.com/r/${subreddit}/comments/${id}/`,
+        comment_count: num_comments,
       });
     }
 
@@ -245,6 +255,7 @@ interface GitHubRepo {
   full_name: string;
   description: string | null;
   html_url: string;
+  homepage: string | null;
   stargazers_count: number;
   forks_count: number;
   language: string | null;
@@ -297,6 +308,8 @@ async function fetchGitHub(): Promise<GitHubSignal[]> {
         forks: repo.forks_count,
         language: repo.language,
         topics: repo.topics ?? [],
+        url: repo.html_url,
+        homepage_url: repo.homepage || undefined,
       });
     }
 

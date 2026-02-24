@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AlphaCard } from "@/types";
@@ -34,14 +35,17 @@ export function CardDetail({ card }: CardDetailProps) {
     <article className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <span className="text-[10px] font-mono uppercase tracking-widest text-text-dim mb-2 block">
-          {card.category.replace("-", " ")}
-        </span>
+        <Link
+          href={`/category/${card.category}`}
+          className="text-[10px] font-mono uppercase tracking-widest text-text-dim mb-2 block hover:text-accent transition-colors"
+        >
+          {card.category.replace(/-/g, " ")}
+        </Link>
         <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl font-bold leading-tight mb-4">
           {card.title}
         </h1>
         <div className="flex items-center gap-4 text-sm text-text-muted font-mono">
-          <span>{card.date}</span>
+          <time dateTime={card.date}>{card.date}</time>
           <span>{card.evidence.length} evidence</span>
           <span>{uniqueSources.size} sources</span>
         </div>
@@ -51,6 +55,16 @@ export function CardDetail({ card }: CardDetailProps) {
       <p className="font-[family-name:var(--font-serif)] text-lg leading-relaxed mb-8">
         {card.thesis}
       </p>
+
+      {/* Opportunity — accent left border to distinguish from Key Facts */}
+      <div className="border-l-3 border-l-accent bg-surface-inset rounded-lg p-6 mb-8">
+        <h2 className="font-mono text-xs uppercase tracking-widest text-accent-muted mb-3">
+          Opportunity
+        </h2>
+        <p className="font-[family-name:var(--font-serif)] text-base leading-relaxed">
+          {card.opportunity}
+        </p>
+      </div>
 
       {/* Evidence */}
       <section className="mb-8">
@@ -70,11 +84,11 @@ export function CardDetail({ card }: CardDetailProps) {
                 &ldquo;{ev.text}&rdquo;
               </p>
               <div className="flex items-center justify-between text-xs text-text-muted">
-                <span
-                  className={cn("font-mono", sourceColors[ev.source] ?? "text-text-muted")}
+                <cite
+                  className={cn("font-mono not-italic", sourceColors[ev.source] ?? "text-text-muted")}
                 >
                   {sourceLabels[ev.source] ?? ev.source}
-                </span>
+                </cite>
                 <div className="flex items-center gap-3">
                   <span className="font-mono font-bold">
                     {ev.engagement.toLocaleString()} engagement
@@ -97,14 +111,23 @@ export function CardDetail({ card }: CardDetailProps) {
         </div>
       </section>
 
-      {/* Opportunity — inset panel */}
-      <div className="bg-surface-inset rounded-lg p-6 mb-4">
+      {/* Key Facts */}
+      <div className="bg-surface-inset rounded-lg p-5 mb-4">
         <h2 className="font-mono text-xs uppercase tracking-widest text-text-dim mb-3">
-          Opportunity
+          Key Facts
         </h2>
-        <p className="font-[family-name:var(--font-serif)] text-base leading-relaxed">
-          {card.opportunity}
-        </p>
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+          <dt className="text-text-muted">Category</dt>
+          <dd className="text-text capitalize">{card.category.replace(/-/g, " ")}</dd>
+          <dt className="text-text-muted">Date</dt>
+          <dd className="text-text"><time dateTime={card.date}>{card.date}</time></dd>
+          <dt className="text-text-muted">Signal strength</dt>
+          <dd className="text-text">{card.signal_strength}/10</dd>
+          <dt className="text-text-muted">Sources</dt>
+          <dd className="text-text">{Array.from(uniqueSources).map((s) => sourceLabels[s] ?? s).join(", ")}</dd>
+          <dt className="text-text-muted">Evidence count</dt>
+          <dd className="text-text">{card.evidence.length}</dd>
+        </dl>
       </div>
 
       {/* AI attribution */}

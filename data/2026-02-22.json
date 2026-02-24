@@ -13,29 +13,25 @@
         {
           "text": "I'm tired of Copilot suggesting code that uses deprecated APIs. I'd pay for something that actually knows the latest React docs.",
           "source": "hackernews",
-          "url": "https://news.ycombinator.com/item?id=example1",
           "engagement": 342
         },
         {
           "text": "Built a tool that only does Rails completions but knows every gem. My team's productivity jumped 40%.",
           "source": "reddit",
-          "url": "https://reddit.com/r/rails/comments/example",
           "engagement": 189
         },
         {
           "text": "The problem isn't AI coding — it's that these tools try to be good at everything and end up mediocre at everything.",
           "source": "hackernews",
-          "url": "https://news.ycombinator.com/item?id=example2",
           "engagement": 567
         },
         {
           "text": "cursor-rails: AI coding assistant fine-tuned exclusively on Rails 8 codebases",
           "source": "github",
-          "url": "https://github.com/example/cursor-rails",
           "engagement": 1200
         }
       ],
-      "opportunity": "Build a framework-specific AI coding assistant that deeply indexes one ecosystem (Rails, Laravel, Next.js) instead of trying to cover all languages. Charge $20/mo to teams who are already paying for Copilot but frustrated with generic suggestions.",
+      "opportunity": "The defensible wedge is documentation freshness, not framework focus. Copilot and Cursor train on repos months old — the team that indexes official docs within 24h of release owns the frustration gap. Target: agency devs maintaining 5+ client projects across framework versions.",
       "sources": ["hackernews", "reddit", "github"],
       "signal_count": 23
     },
@@ -50,23 +46,20 @@
         {
           "text": "We replaced our entire Firebase backend with a local-first sync engine. Latency went from 200ms to instant. Users noticed immediately.",
           "source": "hackernews",
-          "url": "https://news.ycombinator.com/item?id=example3",
           "engagement": 445
         },
         {
           "text": "Every time I post about local-first architecture, my inbox fills up. There's clearly unmet demand here.",
           "source": "reddit",
-          "url": "https://reddit.com/r/programming/comments/example2",
           "engagement": 234
         },
         {
           "text": "zero-sync: Production-ready CRDT sync engine with SQLite backend",
           "source": "github",
-          "url": "https://github.com/example/zero-sync",
           "engagement": 2100
         }
       ],
-      "opportunity": "The sync engine layer is commoditizing, but the developer experience layer is wide open. Build migration tools, debugging dashboards, or conflict-resolution UIs for teams adopting local-first architecture.",
+      "opportunity": "Three CRDT engines launched this month but none ship a conflict inspector — the equivalent of git diff for merge conflicts. The first visual conflict-resolution UI that plugs into ElectricSQL or PowerSync captures the dev who just hit their first data fork in production.",
       "sources": ["hackernews", "reddit", "github"],
       "signal_count": 18
     },
@@ -81,23 +74,20 @@
         {
           "text": "Just spent 3 days on my pricing page. Again. For the third SaaS this year. Someone please make a Stripe-connected pricing component I can drop in.",
           "source": "reddit",
-          "url": "https://reddit.com/r/SaaS/comments/example3",
           "engagement": 156
         },
         {
           "text": "I'd pay $50 for a pricing page generator that handles Stripe checkout, annual/monthly toggle, and looks good on mobile.",
           "source": "reddit",
-          "url": "https://reddit.com/r/Entrepreneur/comments/example4",
           "engagement": 89
         },
         {
           "text": "PricingPage.fyi — open source pricing page components for Next.js + Stripe",
           "source": "producthunt",
-          "url": "https://www.producthunt.com/posts/example",
           "engagement": 445
         }
       ],
-      "opportunity": "Build a pricing page generator that outputs production-ready code (Next.js/React) with Stripe integration baked in. One-time purchase at $49-99. Distribution via Indie Hackers, Twitter/X builder community, and Product Hunt.",
+      "opportunity": "Existing template marketplaces (Tailwind UI, shadcn) sell static components — none handle Stripe webhook wiring or subscription state. A $49 one-time purchase that ships a working checkout flow, not just a visual template, wins the solo founder who just validated their idea and needs to charge money this week.",
       "sources": ["reddit", "producthunt"],
       "signal_count": 14
     },
@@ -112,29 +102,25 @@
         {
           "text": "Our AI agent processed 10,000 support tickets last month. We have no idea why it escalated 300 of them. We need observability, not just logging.",
           "source": "hackernews",
-          "url": "https://news.ycombinator.com/item?id=example4",
           "engagement": 678
         },
         {
           "text": "I built an agent monitoring dashboard for our team. The amount of inbound interest I got from a single tweet about it was insane.",
           "source": "reddit",
-          "url": "https://reddit.com/r/artificial/comments/example5",
           "engagement": 312
         },
         {
           "text": "agent-watch: Open-source tracing and replay for LLM agent workflows",
           "source": "github",
-          "url": "https://github.com/example/agent-watch",
           "engagement": 3400
         },
         {
           "text": "AgentTrace — Observability platform for AI agent pipelines",
           "source": "producthunt",
-          "url": "https://www.producthunt.com/posts/example2",
           "engagement": 890
         }
       ],
-      "opportunity": "Build an observability layer specifically for AI agent workflows: trace reasoning chains, visualize tool-call graphs, flag anomalous behavior, and enable session replay. This is a clear infrastructure gap with enterprise willingness to pay.",
+      "opportunity": "Langsmith and Helicone cover API-call tracing but not multi-step reasoning replay. The 3,400-star agent-watch repo proves demand for open-source tracing, but enterprises need hosted session replay with RBAC. Wedge: ship a hosted replay viewer on top of the agent-watch protocol, then sell SOC 2-compliant retention.",
       "sources": ["hackernews", "reddit", "github", "producthunt"],
       "signal_count": 31
     },
@@ -149,23 +135,20 @@
         {
           "text": "My browser extension hit $3K MRR in 6 weeks. No landing page, no SEO, no ads. Just Chrome Web Store + a good product.",
           "source": "reddit",
-          "url": "https://reddit.com/r/SaaS/comments/example6",
           "engagement": 423
         },
         {
           "text": "Show HN: I built a browser extension that rewrites corporate jargon in real-time. 5K users in a week.",
           "source": "hackernews",
-          "url": "https://news.ycombinator.com/item?id=example5",
           "engagement": 289
         },
         {
           "text": "The economics of browser extensions are criminally underrated. Low infra cost, built-in distribution, sticky usage.",
           "source": "reddit",
-          "url": "https://reddit.com/r/Entrepreneur/comments/example7",
           "engagement": 178
         }
       ],
-      "opportunity": "Pick a high-frequency workflow that lives in the browser (email drafting, meeting notes, data extraction from web pages) and ship a focused extension with a $9/mo subscription. The Chrome Web Store is an underutilized distribution channel.",
+      "opportunity": "Chrome Web Store's built-in discovery means near-zero CAC, but the $3K MRR ceiling on single-function extensions is real. The play is to launch a narrow utility (tab manager, email cleanup), prove retention, then expand into an extension suite with shared billing — the Setapp model for browser tools.",
       "sources": ["hackernews", "reddit"],
       "signal_count": 15
     }
