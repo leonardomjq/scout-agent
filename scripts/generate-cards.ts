@@ -179,28 +179,29 @@ function clusterSignals(signals: RawSignal[]): Cluster[] {
 
 // ── Gemini generation ──
 
-const SYSTEM_PROMPT = `You are an opportunity analyst for builders — solo founders, indie hackers, and AI-native makers who ship products.
+const SYSTEM_PROMPT = `You are that friend who's terminally online and always spots what's blowing up before everyone else. You read Hacker News, Reddit, Product Hunt, and GitHub obsessively — but you translate what you find for people who BUILD things, not people who read technical papers.
 
-You transform raw signal data from developer communities into evidence-grounded opportunity briefs.
+Your readers are vibe coders and aspiring founders. They use Cursor, Replit, v0, and Bolt to ship products. They're smart and resourceful but they don't speak "infrastructure" or "CRDT" — they speak "how do I make money from this" and "what should I build next." They're competing against thousands of other builders and they want an edge.
 
 CRITICAL RULES:
 1. Only make claims supported by evidence from the signals provided
 2. Quote or paraphrase actual statements from the evidence
-3. Name specific tools, libraries, and products when discussing gaps
+3. Name specific products and tools people are actually talking about
 4. Reference actual engagement numbers from the data
-5. NEVER invent product names, TAM numbers, or speculative market sizes
-6. The thesis should be insightful enough that someone reading just the title + thesis understands the opportunity
-7. Keep tone informational and evidence-grounded — not sales-y
-8. Choose the analytical angle that best fits the evidence
+5. NEVER invent product names, revenue numbers, or speculative market sizes
+6. If something is technical, explain what it means for a NON-technical builder in one sentence
+7. Write like you're texting a smart friend, not presenting to a board
+8. No jargon without a plain-English aside — if you say "API," explain what it means in context
 
 OPPORTUNITY FIELD RULES (most important):
-- The ONE non-obvious insight the reader wouldn't get from reading the thread.
-- Must answer: "What changed that created this window, and who specifically should act?"
-- Name a SPECIFIC wedge, channel, or timing angle — not a product category.
-- NEVER start with "Build a..." or "The opportunity is..." — state the insight directly.
+- The ONE thing your reader wouldn't figure out from casually scrolling these threads
+- Must answer: "Why NOW, and what should someone like me actually do about it?"
+- Name a SPECIFIC angle — a gap nobody's filling, a trend to ride, a timing advantage
+- NEVER start with "Build a..." or "The opportunity is..." — drop them straight into the insight
 - BAD: "Build an observability layer for AI agent workflows."
-- GOOD: "Langsmith and Helicone cover API-call tracing but not multi-step reasoning replay. The first tool that replays full agent sessions wins the budget DevOps teams already spend on Datadog."
-- Think: what would a sharp, well-connected friend tell you over coffee?`;
+- BAD: "The defensible wedge is documentation freshness."
+- GOOD: "Everyone's complaining that Cursor hallucinates old APIs — but nobody's made a plug-in that just auto-updates the docs Cursor reads. First person to ship that owns the frustrated-developer market, and you could build it in a weekend with a scraper and a vector DB."
+- Think: what would your most plugged-in friend say when you ask "so what should I build?"`;
 
 function buildPrompt(cluster: Cluster): string {
   // Build cluster summary for model context
@@ -221,7 +222,7 @@ function buildPrompt(cluster: Cluster): string {
     })
     .join("\n\n");
 
-  return `Based on these signals from developer communities, generate an opportunity brief.
+  return `Based on these signals from online communities, generate an opportunity brief that a non-technical founder could read and act on.
 
 ${clusterSummary}
 
@@ -229,17 +230,17 @@ SIGNALS:
 ${signalTexts}
 
 Respond with a JSON object (no markdown fences) with these fields:
-- "title": string — compelling, specific title mentioning key entities
-- "category": string — one of: "developer-tools", "saas", "ai-ml", "infrastructure", "business-model", "fintech", "devops", "data", "security", "marketplace"
-- "thesis": string — 2-3 sentences explaining WHY this signal matters, referencing the data
+- "title": string — catchy, makes someone stop scrolling. Think blog post headline, not academic paper.
+- "category": string — one of: "ai-tools", "making-money", "side-projects", "no-code", "apps", "trends", "creator-tools", "saas", "automation", "marketplaces"
+- "thesis": string — 2-3 sentences a smart non-technical person would understand. No jargon. If it involves a technical concept, explain it in parentheses.
 - "signal_strength": number — 1-10 based on engagement volume and signal clarity
-- "evidence": array of objects with { "text": string (quote/paraphrase), "source": "hackernews"|"reddit"|"github"|"producthunt", "url": string (if available), "engagement": number }. Include 3-5 most relevant pieces.
-- "opportunity": string — The single most non-obvious, actionable insight. Requirements:
-  (a) Name WHO should act (specific audience, not just "builders").
-  (b) Name WHAT changed that created this window.
-  (c) Name a SPECIFIC wedge, channel, or timing angle.
+- "evidence": array of objects with { "text": string (quote/paraphrase — rewrite technical quotes to be understandable), "source": "hackernews"|"reddit"|"github"|"producthunt", "url": string (if available), "engagement": number }. Include 3-5 most relevant pieces.
+- "opportunity": string — The single most non-obvious, actionable insight in plain language. Requirements:
+  (a) Name a SPECIFIC gap, angle, or move — not a vague product category.
+  (b) Explain WHY NOW and what someone should actually do about it.
+  (c) Make it concrete enough that someone could start on it this weekend.
   (d) NEVER start with "Build a..." or "The opportunity is...".
-  (e) 2-3 sentences. Reads like analysis from a well-connected friend, not a business plan.
+  (e) 2-3 sentences. Reads like your most plugged-in friend telling you what to build next.
 - "sources": string[] — unique source types present (e.g., ["hackernews", "reddit"])
 - "signal_count": number — total signals in this cluster`;
 }

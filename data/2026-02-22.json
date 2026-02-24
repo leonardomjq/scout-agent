@@ -3,20 +3,20 @@
   "generated_at": "2026-02-22T08:00:00.000Z",
   "cards": [
     {
-      "id": "2026-02-22-ai-coding-assistants-fatigue",
+      "id": "2026-02-22-ai-coding-tool-backlash",
       "date": "2026-02-22",
-      "title": "AI Coding Assistant Fatigue Is Creating Demand for Specialized Alternatives",
-      "category": "developer-tools",
-      "thesis": "Developers are expressing growing frustration with general-purpose AI coding assistants that hallucinate APIs and generate boilerplate. HN and Reddit threads show rising demand for domain-specific coding tools that deeply understand individual frameworks rather than trying to do everything.",
+      "title": "The AI Coding Tool Backlash Has Begun",
+      "category": "ai-tools",
+      "thesis": "People are getting fed up with AI coding tools that suggest outdated code and make stuff up. Hacker News and Reddit are full of developers saying they'd pay for a tool that actually knows the latest version of the framework they're using, instead of trying to do everything and doing it all badly.",
       "signal_strength": 8,
       "evidence": [
         {
-          "text": "I'm tired of Copilot suggesting code that uses deprecated APIs. I'd pay for something that actually knows the latest React docs.",
+          "text": "I'm tired of Copilot suggesting code that uses old, broken APIs. I'd pay for something that actually knows the latest React docs.",
           "source": "hackernews",
           "engagement": 342
         },
         {
-          "text": "Built a tool that only does Rails completions but knows every gem. My team's productivity jumped 40%.",
+          "text": "Built a tool that only does Rails completions but knows every library inside out. My team's productivity jumped 40%.",
           "source": "reddit",
           "engagement": 189
         },
@@ -26,21 +26,21 @@
           "engagement": 567
         },
         {
-          "text": "cursor-rails: AI coding assistant fine-tuned exclusively on Rails 8 codebases",
+          "text": "cursor-rails: AI coding assistant trained exclusively on Rails 8 codebases",
           "source": "github",
           "engagement": 1200
         }
       ],
-      "opportunity": "The defensible wedge is documentation freshness, not framework focus. Copilot and Cursor train on repos months old — the team that indexes official docs within 24h of release owns the frustration gap. Target: agency devs maintaining 5+ client projects across framework versions.",
+      "opportunity": "Everyone's complaining that Cursor hallucinates old APIs — but nobody's made a plug-in that just auto-updates the docs Cursor reads. First person to ship that owns the frustrated-developer market, and you could build it in a weekend with a scraper and a vector database (basically a searchable index of up-to-date documentation).",
       "sources": ["hackernews", "reddit", "github"],
       "signal_count": 23
     },
     {
-      "id": "2026-02-22-local-first-sync-engines",
+      "id": "2026-02-22-apps-that-work-offline",
       "date": "2026-02-22",
-      "title": "Local-First Sync Engines Are Breaking Out of the Niche",
-      "category": "infrastructure",
-      "thesis": "CRDTs and local-first sync are moving from academic curiosity to production infrastructure. Three new sync engine repos crossed 1,000 stars this week, and Show HN posts about offline-first apps are consistently hitting the front page. The demand signal is clear: builders want sync without vendor lock-in.",
+      "title": "Apps That Work Offline Are Suddenly a Big Deal",
+      "category": "apps",
+      "thesis": "There's a wave of new tools that let apps work without an internet connection and then sync up when you're back online. Three of these projects got over 1,000 stars on GitHub this week, and Show HN posts about offline-capable apps keep hitting the front page. People want apps that feel instant and don't depend on a server.",
       "signal_strength": 7,
       "evidence": [
         {
@@ -54,21 +54,21 @@
           "engagement": 234
         },
         {
-          "text": "zero-sync: Production-ready CRDT sync engine with SQLite backend",
+          "text": "zero-sync: Production-ready sync engine with offline support and a local database",
           "source": "github",
           "engagement": 2100
         }
       ],
-      "opportunity": "Three CRDT engines launched this month but none ship a conflict inspector — the equivalent of git diff for merge conflicts. The first visual conflict-resolution UI that plugs into ElectricSQL or PowerSync captures the dev who just hit their first data fork in production.",
+      "opportunity": "Three offline sync tools launched this month, but none of them have a simple way to see what happened when two people edited the same thing at once — like a \"track changes\" view. The first person to build a visual conflict-resolution screen that plugs into these tools captures every developer who just hit their first data conflict in production and panicked.",
       "sources": ["hackernews", "reddit", "github"],
       "signal_count": 18
     },
     {
-      "id": "2026-02-22-saas-pricing-page-builders",
+      "id": "2026-02-22-pricing-page-that-just-works",
       "date": "2026-02-22",
-      "title": "Solo Founders Are Burning Hours on Pricing Pages Instead of Building Product",
-      "category": "saas",
-      "thesis": "A recurring frustration pattern across r/SaaS and r/Entrepreneur: indie builders spend 2-3 days implementing pricing pages with toggle logic, Stripe integration, and responsive design. Every. Single. Launch. The friction is consistent and the willingness to pay is evident from multiple 'take my money' responses.",
+      "title": "Everyone Wants a Pricing Page That Just Works",
+      "category": "making-money",
+      "thesis": "There's a recurring complaint across r/SaaS and r/Entrepreneur: indie builders keep spending 2-3 days building pricing pages with payment integration every time they launch something new. Multiple people literally said \"take my money\" in the threads. The willingness to pay for a drop-in solution is obvious.",
       "signal_strength": 6,
       "evidence": [
         {
@@ -87,20 +87,20 @@
           "engagement": 445
         }
       ],
-      "opportunity": "Existing template marketplaces (Tailwind UI, shadcn) sell static components — none handle Stripe webhook wiring or subscription state. A $49 one-time purchase that ships a working checkout flow, not just a visual template, wins the solo founder who just validated their idea and needs to charge money this week.",
+      "opportunity": "Existing template marketplaces sell you a pretty pricing page, but none of them actually handle the payment wiring — you still have to connect Stripe, manage subscription states, and handle upgrades yourself. A $49 one-time purchase that ships a working checkout flow (not just a visual template) wins every solo founder who just validated their idea and needs to start charging this week.",
       "sources": ["reddit", "producthunt"],
       "signal_count": 14
     },
     {
-      "id": "2026-02-22-ai-agent-monitoring",
+      "id": "2026-02-22-ai-agents-zero-visibility",
       "date": "2026-02-22",
-      "title": "AI Agent Monitoring Is the Observability Gap Nobody's Filled Yet",
-      "category": "ai-ml",
-      "thesis": "As AI agents move from demos to production, teams are discovering they have zero visibility into agent behavior. Traditional APM tools don't understand multi-step agent workflows, tool calls, or reasoning chains. Multiple HN threads this week specifically asked for 'Datadog but for AI agents.'",
+      "title": "People Are Shipping AI Agents With Zero Idea What They're Doing",
+      "category": "ai-tools",
+      "thesis": "As AI agents (automated bots that do tasks for you) move from demos to real products, teams are realizing they have no way to see what the agent actually did or why. Traditional monitoring tools don't understand multi-step AI workflows. Multiple Hacker News threads this week asked for \"Datadog but for AI agents\" — basically a dashboard that shows you what your AI is doing and why.",
       "signal_strength": 9,
       "evidence": [
         {
-          "text": "Our AI agent processed 10,000 support tickets last month. We have no idea why it escalated 300 of them. We need observability, not just logging.",
+          "text": "Our AI agent processed 10,000 support tickets last month. We have no idea why it escalated 300 of them. We need visibility, not just logs.",
           "source": "hackernews",
           "engagement": 678
         },
@@ -110,26 +110,26 @@
           "engagement": 312
         },
         {
-          "text": "agent-watch: Open-source tracing and replay for LLM agent workflows",
+          "text": "agent-watch: Open-source tracing and replay for AI agent workflows",
           "source": "github",
           "engagement": 3400
         },
         {
-          "text": "AgentTrace — Observability platform for AI agent pipelines",
+          "text": "AgentTrace — Dashboard for watching what your AI agents are actually doing",
           "source": "producthunt",
           "engagement": 890
         }
       ],
-      "opportunity": "Langsmith and Helicone cover API-call tracing but not multi-step reasoning replay. The 3,400-star agent-watch repo proves demand for open-source tracing, but enterprises need hosted session replay with RBAC. Wedge: ship a hosted replay viewer on top of the agent-watch protocol, then sell SOC 2-compliant retention.",
+      "opportunity": "The existing tools for tracking AI calls only show you individual requests, not the full chain of what the agent did from start to finish. The agent-watch repo (3,400 stars) proves massive demand for open-source tracking, but companies need a hosted version with team permissions and a visual replay of what happened. Ship a hosted replay viewer on top of agent-watch's open-source format — that's your wedge into a market that doesn't have a clear winner yet.",
       "sources": ["hackernews", "reddit", "github", "producthunt"],
       "signal_count": 31
     },
     {
-      "id": "2026-02-22-browser-extension-saas",
+      "id": "2026-02-22-browser-extensions-printing-money",
       "date": "2026-02-22",
-      "title": "Browser Extensions Are Quietly Becoming Viable SaaS Businesses",
-      "category": "business-model",
-      "thesis": "A pattern emerging across Product Hunt and Show HN: solo builders are shipping browser extensions with $5-15/mo subscriptions and reaching ramen profitability within weeks. The distribution advantage is massive — Chrome Web Store has built-in discovery, and the install friction is near zero compared to traditional SaaS.",
+      "title": "Browser Extensions Are Printing Money Right Now",
+      "category": "side-projects",
+      "thesis": "A pattern is showing up across Product Hunt and Show HN: solo builders are shipping browser extensions with $5-15/month subscriptions and hitting profitability within weeks. The Chrome Web Store has built-in discovery (people find you without you doing any marketing), and installing an extension is way easier than signing up for a new SaaS product.",
       "signal_strength": 7,
       "evidence": [
         {
@@ -143,12 +143,12 @@
           "engagement": 289
         },
         {
-          "text": "The economics of browser extensions are criminally underrated. Low infra cost, built-in distribution, sticky usage.",
+          "text": "The economics of browser extensions are criminally underrated. Low server costs, built-in distribution, sticky usage.",
           "source": "reddit",
           "engagement": 178
         }
       ],
-      "opportunity": "Chrome Web Store's built-in discovery means near-zero CAC, but the $3K MRR ceiling on single-function extensions is real. The play is to launch a narrow utility (tab manager, email cleanup), prove retention, then expand into an extension suite with shared billing — the Setapp model for browser tools.",
+      "opportunity": "The Chrome Web Store gives you free distribution (people search and find you — no marketing needed), but single-purpose extensions tend to max out around $3K/month. The real play: launch one narrow utility that people love (a tab manager, an email cleaner, a page summarizer), prove that people keep using it, then expand into a bundle of extensions with shared billing — like a subscription that gives you access to a whole suite of browser tools.",
       "sources": ["hackernews", "reddit"],
       "signal_count": 15
     }

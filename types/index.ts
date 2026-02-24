@@ -9,7 +9,7 @@ export interface AlphaCard {
   id: string; // "2026-02-22-ai-coding-tools"
   date: string; // "2026-02-22"
   title: string;
-  category: string; // "developer-tools", "saas", "ai-ml", etc.
+  category: string; // "ai-tools", "saas", "making-money", etc.
   thesis: string;
   signal_strength: number; // 1-10
   evidence: Evidence[];

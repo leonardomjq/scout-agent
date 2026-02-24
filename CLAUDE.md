@@ -61,7 +61,7 @@ Three-step flow orchestrated by `scripts/daily.ts`:
   id: string;           // "2026-02-22-ai-coding-tools"
   date: string;         // "2026-02-22"
   title: string;
-  category: string;     // "developer-tools", "saas", "ai-ml", etc.
+  category: string;     // "ai-tools", "saas", "making-money", etc.
   thesis: string;
   signal_strength: number; // 1-10
   evidence: Evidence[];
@@ -96,19 +96,20 @@ Schemas defined in `schemas/card.ts`, types re-exported from `types/index.ts`.
 
 The full voice and content guide lives in `.claude/product-marketing-context.md`. Summary:
 
-**Audience:** Solo founders, indie hackers, and AI-native builders who ship products.
+**Audience:** Vibe coders, aspiring founders, and AI-native builders who ship products using tools like Cursor, Replit, v0, and Bolt.
 
-**Voice:** Transparent, grounded, quietly useful. Let evidence speak. No sales language for a free product.
+**Voice:** Transparent, grounded, and interesting. Like a friend who reads everything, notices patterns, and tells you "hey, this is the thing right now." Write like you're texting a smart friend, not presenting to a board.
 
 **Key rules:**
 - Use "Scout Daily" as subject, not "we"
 - State honest metrics (~250 signals/day, 4 sources, typically 3-10 cards)
 - Always attribute AI generation
 - Link evidence to original sources
+- Explain technical concepts in plain English — no jargon without a plain-English aside
 - No urgency framing, no FOMO, no exclusivity language
 
-**Words to use:** opportunity, signals, evidence, builders, daily, free, open source, sign up, get briefs by email
-**Words to avoid:** exclusive, limited, upgrade, subscribe (in marketing copy), intelligence, curated, "we"
+**Words to use:** opportunity, signals, trending, blowing up, edge, gap, builders, vibe coders, ship it, weekend project, free, open source, sign up, get briefs by email
+**Words to avoid:** exclusive, limited, upgrade, subscribe (in marketing copy), intelligence, curated, "we", wedge, defensible, TAM, moat, infrastructure (in audience-facing copy)
 
 ## Code style
 
