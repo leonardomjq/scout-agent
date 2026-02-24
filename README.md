@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D10-orange)](https://pnpm.io/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=flat-square)](https://overheard.vercel.app)
 
 **Spots what's blowing up across HN, Reddit, GitHub, and Product Hunt — and tells you what to build next.**
 
@@ -17,6 +18,8 @@ Overheard is a free, open-source site that publishes AI-generated opportunity br
 No account needed. No paywall. No "premium tier."
 
 Built for vibe coders, aspiring founders, and anyone who wants to know what's trending before everyone else catches on.
+
+![Overheard — Alpha Cards dashboard](./public/screenshot.png)
 
 ---
 
@@ -74,6 +77,12 @@ No database. No auth. No payments. Total cost: **$0/month**.
 ---
 
 ## Quickstart
+
+### Deploy your own
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fleonardomjq%2Foverheard&env=GEMINI_API_KEY&envDescription=Google%20AI%20Studio%20API%20key%20for%20card%20generation&envLink=https%3A%2F%2Faistudio.google.com%2Fapikey&project-name=overheard&repository-name=overheard)
+
+### Local development
 
 ```bash
 # Clone and install
@@ -188,6 +197,12 @@ pnpm daily        # Run full pipeline (fetch → generate)
 ## Contributing
 
 Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions and guidelines.
+
+## Support
+
+If Overheard is useful to you, **[star this repo](https://github.com/leonardomjq/overheard)** — it helps others find it.
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/leonardomjq)
 
 ## Security
 

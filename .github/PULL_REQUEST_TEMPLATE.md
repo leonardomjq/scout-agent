@@ -2,6 +2,8 @@
 
 <!-- Brief description of what this PR does and why -->
 
+Closes #<!-- issue number -->
+
 ## Changes
 
 -
@@ -15,17 +17,21 @@
 - [ ] Test
 - [ ] Chore
 
-## Testing
+## Checklist
 
-- [ ] Unit tests pass (`pnpm test`)
 - [ ] Type check passes (`pnpm typecheck`)
 - [ ] Build succeeds (`pnpm build`)
 - [ ] Manual testing done
+- [ ] No breaking changes (or documented below)
+
+## Breaking Changes
+
+<!-- If this PR introduces breaking changes, describe them here and any migration steps needed. Otherwise, delete this section. -->
 
 ## Screenshots
 
 <!-- If applicable, add screenshots or screen recordings -->
 
-## Related Issues
+---
 
-<!-- Link related issues: Fixes #123, Relates to #456 -->
+> New here? See [CONTRIBUTING.md](../CONTRIBUTING.md) for setup instructions and guidelines.
