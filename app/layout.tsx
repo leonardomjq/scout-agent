@@ -31,28 +31,28 @@ const ibmPlexSerif = IBM_Plex_Serif({
   variable: "--font-serif",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scout-daily.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://overheard.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Scout Daily — Free Opportunity Briefs for Builders",
-    template: "%s | Scout Daily",
+    default: "Overheard — Free Opportunity Briefs for Builders",
+    template: "%s | Overheard",
   },
   description:
     "Daily AI-generated opportunity briefs from HN, Reddit, GitHub, and Product Hunt. Free, open-source market signals for founders and builders.",
   openGraph: {
-    title: "Scout Daily — Free Opportunity Briefs for Builders",
+    title: "Overheard — Free Opportunity Briefs for Builders",
     description:
       "Daily AI-generated opportunity briefs synthesized from thousands of conversations across HN, Reddit, GitHub, and Product Hunt.",
     url: BASE_URL,
-    siteName: "Scout Daily",
+    siteName: "Overheard",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Scout Daily — Free Opportunity Briefs for Builders",
+    title: "Overheard — Free Opportunity Briefs for Builders",
     description:
       "Daily AI-generated opportunity briefs synthesized from thousands of conversations across HN, Reddit, GitHub, and Product Hunt.",
   },
@@ -85,7 +85,7 @@ export default function RootLayout({
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="Scout Daily RSS Feed"
+          title="Overheard RSS Feed"
           href="/feed.xml"
         />
         <JsonLd data={buildWebSiteSchema()} />

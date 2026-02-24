@@ -1,4 +1,4 @@
-# Scout Daily Design System
+# Overheard Design System
 
 Cool dark aesthetic with slate-blue accent. OKLCH color space, flat card system, sidebar layout. Content-first reading experience for builders.
 
@@ -218,7 +218,7 @@ Focus: `border-accent/40`
 ## 10. Patterns
 
 ### Logo
-Lowercase `scout_daily` — underscore in `text-accent`, "daily" in `text-text-dim`. Font: mono.
+Lowercase `overheard` — "heard" in `text-text-dim`. Font: mono.
 
 ### Sticky header
 ```

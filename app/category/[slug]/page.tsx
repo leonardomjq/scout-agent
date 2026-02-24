@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: getCategoryDescription(slug),
     alternates: { canonical: `/category/${slug}` },
     openGraph: {
-      title: `${label} Opportunities | Scout Daily`,
+      title: `${label} Opportunities | Overheard`,
       description: `${cards.length} opportunity briefs in ${label}, synthesized from Hacker News, Reddit, GitHub, and Product Hunt.`,
     },
   };

@@ -1,4 +1,4 @@
-# Contributing to Scout Daily
+# Contributing to Overheard
 
 Thanks for your interest in contributing! Here's everything you need to get started.
 
@@ -8,8 +8,8 @@ Thanks for your interest in contributing! Here's everything you need to get star
 # Prerequisites: Node.js >= 22, pnpm >= 10
 
 # Clone and install
-git clone https://github.com/leonardomjq/scout-agent.git
-cd scout-agent
+git clone https://github.com/leonardomjq/overheard.git
+cd overheard
 pnpm install
 
 # Start the dev server
@@ -99,4 +99,4 @@ A few things to know before diving in:
 
 ## Questions?
 
-Open an [issue](https://github.com/leonardomjq/scout-agent/issues) or start a [discussion](https://github.com/leonardomjq/scout-agent/discussions).
+Open an [issue](https://github.com/leonardomjq/overheard/issues) or start a [discussion](https://github.com/leonardomjq/overheard/discussions).

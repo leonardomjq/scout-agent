@@ -1,14 +1,14 @@
 import type { AlphaCard } from "@/types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scout-daily.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://overheard.vercel.app";
 
 /** Organization without @context — safe for embedding inside other schemas */
 function orgEntity() {
   return {
     "@type": "Organization",
-    name: "Scout Daily",
+    name: "Overheard",
     url: BASE_URL,
-    sameAs: ["https://github.com/leonardomjq/scout-agent"],
+    sameAs: ["https://github.com/leonardomjq/overheard"],
     founder: {
       "@type": "Person",
       name: "Leonardo Jaques",
@@ -21,7 +21,7 @@ export function buildWebSiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Scout Daily",
+    name: "Overheard",
     url: BASE_URL,
     description:
       "Daily AI-generated opportunity briefs from HN, Reddit, GitHub, and Product Hunt. Free, open-source market signals for founders and builders.",
@@ -78,7 +78,7 @@ export function buildCollectionPageSchema(
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `Scout Daily — ${date}`,
+    name: `Overheard — ${date}`,
     url: `${BASE_URL}/edition/${date}`,
     description: `${cards.length} opportunity briefs from ${date}.`,
     mainEntity: {
@@ -102,7 +102,7 @@ export function buildCategoryCollectionSchema(
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `${label} Opportunities — Scout Daily`,
+    name: `${label} Opportunities — Overheard`,
     url: `${BASE_URL}/category/${slug}`,
     description: `${cards.length} opportunity briefs in ${label}.`,
     mainEntity: {
@@ -122,10 +122,10 @@ export function buildAboutPageSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    name: "About Scout Daily",
+    name: "About Overheard",
     url: `${BASE_URL}/about`,
     description:
-      "How Scout Daily works — data sources, methodology, and who built it.",
+      "How Overheard works — data sources, methodology, and who built it.",
     mainEntity: orgEntity(),
   };
 }
@@ -155,7 +155,7 @@ export function buildDefinedTermSchema(term: {
   return {
     "@context": "https://schema.org",
     "@type": "DefinedTermSet",
-    name: `${term.name} — Scout Daily Glossary`,
+    name: `${term.name} — Overheard Glossary`,
     url: `${BASE_URL}/glossary/${term.slug}`,
     hasDefinedTerm: {
       "@type": "DefinedTerm",

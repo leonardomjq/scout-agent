@@ -1,4 +1,4 @@
-# Scout Daily
+# Overheard
 
 Free, open-source site that publishes AI-generated opportunity briefs ("Alpha Cards") every morning, synthesized from signals across Hacker News, Reddit, GitHub, and Product Hunt.
 
@@ -102,7 +102,7 @@ The full voice and content guide lives in `.claude/product-marketing-context.md`
 **Voice:** Transparent, grounded, and interesting. Like a friend who reads everything, notices patterns, and tells you "hey, this is the thing right now." Write like you're texting a smart friend, not presenting to a board.
 
 **Key rules:**
-- Use "Scout Daily" as subject, not "we"
+- Use "Overheard" as subject, not "we"
 - State honest metrics (~250 signals/day, 4 sources, typically 3-10 cards)
 - Always attribute AI generation
 - Link evidence to original sources
@@ -147,7 +147,7 @@ Copy `.env.example` to `.env.local`. Variables:
 - **Signal ramp is single-hue** — `signal-high`, `signal-medium`, `signal-low` are all slate-blue at different luminance. Not a traffic-light system.
 - **HN Algolia API timestamp filter:** Without `numericFilters=created_at_i>`, Ask HN and Show HN return all-time top posts instead of recent ones. Always filter to last 48 hours.
 - **GitHub Search API rate limit:** 10 requests/minute without auth. The fetch script uses 1-second delays between requests.
-- **Reddit requires a User-Agent header.** Requests without one get 429'd. The fetch script sets `ScoutAgent-Experiment/1.0`.
+- **Reddit requires a User-Agent header.** Requests without one get 429'd. The fetch script sets `OverheardBot/1.0`.
 - **Product Hunt Atom feed HTML entities:** Content contains encoded HTML (`&amp;`, `&lt;`, etc.) that must be decoded before stripping tags.
 - **Gemini free tier rate limit:** 10 requests per minute (Gemini 2.5 Flash). The generate script uses 5-second delays between card generation calls.
 - **Data files are committed to the repo.** The `data/` directory contains both `signals-raw.json` (transient, overwritten each run) and `YYYY-MM-DD.json` (permanent daily snapshots).

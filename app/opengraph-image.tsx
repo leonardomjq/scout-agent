@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
-export const alt = "Scout Daily — Free Opportunity Briefs for Builders";
+export const alt = "Overheard — Free Opportunity Briefs for Builders";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -30,9 +30,8 @@ export default function Image() {
             marginBottom: 24,
           }}
         >
-          <span>scout</span>
-          <span style={{ color: "#7b8ab8" }}>_</span>
-          <span style={{ color: "#6b6b78" }}>daily</span>
+          <span>over</span>
+          <span style={{ color: "#6b6b78" }}>heard</span>
         </div>
         <div
           style={{

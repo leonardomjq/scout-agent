@@ -1,6 +1,6 @@
 {
-  "name": "Scout Daily",
-  "short_name": "Scout Daily",
+  "name": "Overheard",
+  "short_name": "Overheard",
   "description": "Daily AI-generated opportunity briefs from HN, Reddit, GitHub, and Product Hunt.",
   "start_url": "/",
   "display": "standalone",

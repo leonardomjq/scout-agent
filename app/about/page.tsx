@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "How Scout Daily works — data sources, methodology, and who built it.",
+  description: "How Overheard works — data sources, methodology, and who built it.",
   alternates: { canonical: "/about" },
 };
 
@@ -19,7 +19,7 @@ export default function AboutPage() {
       <SiteHeader />
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold mb-10">
-          About Scout Daily
+          About Overheard
         </h1>
 
         <div className="space-y-8">
@@ -47,7 +47,7 @@ export default function AboutPage() {
               What this is
             </h2>
             <p className="font-[family-name:var(--font-serif)] text-base leading-relaxed text-text-muted">
-              Scout Daily publishes opportunity briefs every morning, synthesized from
+              Overheard publishes opportunity briefs every morning, synthesized from
               thousands of conversations across Hacker News, Reddit, GitHub, and Product Hunt.
               Each brief identifies a demand spike, frustration cluster, or emerging gap
               where builders could ship something useful.
@@ -138,7 +138,7 @@ export default function AboutPage() {
               </a>
               . The entire project is open source — check the{" "}
               <a
-                href="https://github.com/leonardomjq/scout-agent"
+                href="https://github.com/leonardomjq/overheard"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-text hover:text-accent transition-colors underline underline-offset-2"

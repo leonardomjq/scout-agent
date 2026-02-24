@@ -7,7 +7,7 @@ import { getAllDates, getDailyData } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Archive",
   description:
-    "Browse all past editions of Scout Daily opportunity briefs.",
+    "Browse all past editions of Overheard opportunity briefs.",
   alternates: { canonical: "/archive" },
 };
 
@@ -46,7 +46,7 @@ export default function ArchivePage() {
           Archive
         </h1>
         <p className="font-[family-name:var(--font-serif)] text-base leading-relaxed text-text-muted mb-10">
-          Every edition of Scout Daily, from the first day forward. Each edition contains
+          Every edition of Overheard, from the first day forward. Each edition contains
           AI-generated opportunity briefs synthesized from signals across Hacker News, Reddit,
           GitHub, and Product Hunt.
         </p>

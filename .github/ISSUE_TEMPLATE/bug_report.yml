@@ -48,12 +48,11 @@ body:
     attributes:
       label: Affected Area
       options:
-        - Dashboard / UI
-        - API Routes
-        - Refinery Pipeline
-        - Ingest Webhook
-        - Authentication
-        - Stripe / Billing
+        - Website / UI
+        - Signal Fetching
+        - Card Generation
+        - Email / Subscribe
+        - Data / JSON
         - Other
     validations:
       required: true

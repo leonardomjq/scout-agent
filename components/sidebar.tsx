@@ -91,7 +91,7 @@ export function Sidebar({ date, isLatest = true }: SidebarProps) {
           About
         </a>
         <a
-          href="https://github.com/leonardomjq/scout-agent"
+          href="https://github.com/leonardomjq/overheard"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text transition-colors"

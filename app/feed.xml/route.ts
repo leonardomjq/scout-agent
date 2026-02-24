@@ -1,6 +1,6 @@
 import { getAllDates, getDailyData } from "@/lib/data";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scout-daily.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://overheard.vercel.app";
 
 function escapeXml(str: string): string {
   return str
@@ -39,7 +39,7 @@ export function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Scout Daily</title>
+    <title>Overheard</title>
     <link>${BASE_URL}</link>
     <description>Daily AI-generated opportunity briefs from HN, Reddit, GitHub, and Product Hunt.</description>
     <language>en-us</language>

@@ -1,17 +1,17 @@
 {
-  "name": "scout-daily",
+  "name": "overheard",
   "version": "2.0.0",
   "private": true,
   "description": "Daily AI-generated opportunity briefs from HN, Reddit, GitHub, and Product Hunt",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leonardomjq/scout-agent.git"
+    "url": "git+https://github.com/leonardomjq/overheard.git"
   },
   "bugs": {
-    "url": "https://github.com/leonardomjq/scout-agent/issues"
+    "url": "https://github.com/leonardomjq/overheard/issues"
   },
-  "homepage": "https://github.com/leonardomjq/scout-agent#readme",
+  "homepage": "https://github.com/leonardomjq/overheard#readme",
   "keywords": [
     "market-signals",
     "opportunity-briefs",

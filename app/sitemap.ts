@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllCards, getAllDates, getAllCategories } from "@/lib/data";
 import { getAllGlossaryTerms } from "@/lib/glossary";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scout-daily.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://overheard.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const latestDate = getAllDates()[0];

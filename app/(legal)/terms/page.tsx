@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 const sections = [
   {
     label: "01",
-    title: "About Scout Daily",
+    title: "About Overheard",
     content:
-      "Scout Daily is a free, open-source project that publishes AI-generated opportunity briefs. There are no accounts, no paid tiers, and no subscriptions. The site is available to everyone at no cost.",
+      "Overheard is a free, open-source project that publishes AI-generated opportunity briefs. There are no accounts, no paid tiers, and no subscriptions. The site is available to everyone at no cost.",
   },
   {
     label: "02",
@@ -22,25 +22,25 @@ const sections = [
     label: "03",
     title: "Acceptable Use",
     content:
-      "Scout Daily is open source under the MIT license. You are free to use, modify, and redistribute the code. You may reference Alpha Card insights in your own work. Automated scraping is permitted at reasonable rates — please respect server resources and add a delay between requests.",
+      "Overheard is open source under the MIT license. You are free to use, modify, and redistribute the code. You may reference Alpha Card insights in your own work. Automated scraping is permitted at reasonable rates — please respect server resources and add a delay between requests.",
   },
   {
     label: "04",
     title: "Intellectual Property",
     content:
-      "The Scout Daily codebase is open source under the MIT license. Alpha Card content is generated from publicly available conversations and may be freely referenced with attribution. The Scout Daily name and logo are trademarks of the project.",
+      "The Overheard codebase is open source under the MIT license. Alpha Card content is generated from publicly available conversations and may be freely referenced with attribution. The Overheard name and logo are trademarks of the project.",
   },
   {
     label: "05",
     title: "Email Communications",
     content:
-      "If you sign up for daily briefs, Scout Daily will send you one email per day containing that day's opportunity briefs. You can unsubscribe at any time. Scout Daily does not send marketing emails, promotional content, or share your email with third parties.",
+      "If you sign up for daily briefs, Overheard will send you one email per day containing that day's opportunity briefs. You can unsubscribe at any time. Overheard does not send marketing emails, promotional content, or share your email with third parties.",
   },
   {
     label: "06",
     title: "Limitation of Liability",
     content:
-      "Scout Daily is provided \"as is\" without warranties of any kind, express or implied. The project and its contributors are not liable for any decisions made based on Alpha Card content, any inaccuracies in AI-generated briefs, or any damages arising from use of the service.",
+      "Overheard is provided \"as is\" without warranties of any kind, express or implied. The project and its contributors are not liable for any decisions made based on Alpha Card content, any inaccuracies in AI-generated briefs, or any damages arising from use of the service.",
   },
   {
     label: "07",

@@ -123,7 +123,7 @@ export default async function GlossaryTermPage({ params }: Props) {
               href="/about"
               className="text-sm text-text-muted hover:text-accent transition-colors underline underline-offset-2"
             >
-              How Scout Daily works
+              How Overheard works
             </Link>
           </div>
         </div>

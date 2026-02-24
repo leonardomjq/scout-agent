@@ -22,8 +22,7 @@ export function Logo({ size = "sm", href, className }: LogoProps) {
         className
       )}
     >
-      scout<span className="text-accent">_</span>
-      <span className="text-text-dim">daily</span>
+      over<span className="text-text-dim">heard</span>
     </span>
   );
 

@@ -7,8 +7,7 @@ export function SiteFooter() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-text-muted">
           <div className="flex items-center gap-4">
             <span className="font-mono">
-              scout<span className="text-accent">_</span>
-              <span className="text-text-dim">daily</span>
+              over<span className="text-text-dim">heard</span>
             </span>
             <span className="text-text-dim">
               AI-generated briefs &middot; Not financial advice
@@ -52,7 +51,7 @@ export function SiteFooter() {
               Terms
             </a>
             <a
-              href="https://github.com/leonardomjq/scout-agent"
+              href="https://github.com/leonardomjq/overheard"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-text transition-colors inline-flex items-center gap-1.5"

@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getCardById } from "@/lib/data";
 
 export const runtime = "nodejs";
-export const alt = "Scout Daily Alpha Card";
+export const alt = "Overheard Alpha Card";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -54,9 +54,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         {/* Top: logo + category */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "baseline", fontSize: 24, fontWeight: 700 }}>
-            <span style={{ color: "#f0f0f2" }}>scout</span>
-            <span style={{ color: "#7b8ab8" }}>_</span>
-            <span style={{ color: "#6b6b78" }}>daily</span>
+            <span style={{ color: "#f0f0f2" }}>over</span>
+            <span style={{ color: "#6b6b78" }}>heard</span>
           </div>
           <span
             style={{

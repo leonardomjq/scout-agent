@@ -200,7 +200,7 @@ interface RedditListing {
 }
 
 const REDDIT_UA =
-  "ScoutAgent-Experiment/1.0 (free-source pipeline validation)";
+  "OverheardBot/1.0 (free-source pipeline validation)";
 
 const SUBREDDITS = ["SaaS", "startups", "Entrepreneur", "smallbusiness"];
 

@@ -1,7 +1,7 @@
-# Scout Daily
+# Overheard
 
-[![CI](https://github.com/leonardomjq/scout-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/leonardomjq/scout-agent/actions/workflows/ci.yml)
-[![Daily Cards](https://github.com/leonardomjq/scout-agent/actions/workflows/daily.yml/badge.svg)](https://github.com/leonardomjq/scout-agent/actions/workflows/daily.yml)
+[![CI](https://github.com/leonardomjq/overheard/actions/workflows/ci.yml/badge.svg)](https://github.com/leonardomjq/overheard/actions/workflows/ci.yml)
+[![Daily Cards](https://github.com/leonardomjq/overheard/actions/workflows/daily.yml/badge.svg)](https://github.com/leonardomjq/overheard/actions/workflows/daily.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D10-orange)](https://pnpm.io/)
@@ -12,7 +12,7 @@
 
 ## What is this
 
-Scout Daily is a free, open-source site that publishes AI-generated opportunity briefs ("Alpha Cards") every morning. It scans ~250 signals a day from four sources, clusters them by topic, and uses Gemini Flash to turn the interesting patterns into plain-English cards.
+Overheard is a free, open-source site that publishes AI-generated opportunity briefs ("Alpha Cards") every morning. It scans ~250 signals a day from four sources, clusters them by topic, and uses Gemini Flash to turn the interesting patterns into plain-English cards.
 
 No account needed. No paywall. No "premium tier."
 
@@ -77,8 +77,8 @@ No database. No auth. No payments. Total cost: **$0/month**.
 
 ```bash
 # Clone and install
-git clone https://github.com/leonardomjq/scout-agent.git
-cd scout-agent
+git clone https://github.com/leonardomjq/overheard.git
+cd overheard
 pnpm install
 
 # Start the dev server
@@ -120,7 +120,7 @@ pnpm generate   # Generate cards → data/YYYY-MM-DD.json
 ## Project structure
 
 ```
-scout-agent/
+overheard/
 ├── app/                    # Next.js App Router pages
 │   ├── about/              # About page
 │   ├── api/subscribe/      # Email capture endpoint (only API route)

@@ -19,7 +19,7 @@ export async function generateStaticParams() {
   return getAllCards().map((card) => ({ id: card.id }));
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://scout-daily.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://overheard.vercel.app";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;

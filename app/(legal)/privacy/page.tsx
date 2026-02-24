@@ -8,27 +8,27 @@ export const metadata: Metadata = {
 const sections = [
   {
     label: "01",
-    title: "Information Scout Daily Collects",
+    title: "Information Overheard Collects",
     content:
-      "Scout Daily collects only your email address, and only if you voluntarily sign up to receive daily briefs. No accounts, passwords, or personal profiles are created. No information is collected from visitors who browse the site without signing up.",
+      "Overheard collects only your email address, and only if you voluntarily sign up to receive daily briefs. No accounts, passwords, or personal profiles are created. No information is collected from visitors who browse the site without signing up.",
   },
   {
     label: "02",
     title: "How Email Addresses Are Used",
     content:
-      "Email addresses are used solely to send daily opportunity briefs. Scout Daily does not sell, share, or rent email addresses to third parties. You can unsubscribe at any time.",
+      "Email addresses are used solely to send daily opportunity briefs. Overheard does not sell, share, or rent email addresses to third parties. You can unsubscribe at any time.",
   },
   {
     label: "03",
     title: "Data Processing and AI",
     content:
-      "Scout Daily uses Google Gemini Flash to generate opportunity briefs from publicly available conversations on Hacker News, Reddit, GitHub, and Product Hunt. No personal data is sent to AI models. The AI processes only public discussion content to identify trends and opportunities.",
+      "Overheard uses Google Gemini Flash to generate opportunity briefs from publicly available conversations on Hacker News, Reddit, GitHub, and Product Hunt. No personal data is sent to AI models. The AI processes only public discussion content to identify trends and opportunities.",
   },
   {
     label: "04",
     title: "Analytics",
     content:
-      "Scout Daily uses Plausible Analytics, a privacy-friendly, cookie-free analytics service. No personal data is collected, no cookies are set, and all data is aggregated. Plausible is compliant with GDPR, CCPA, and PECR.",
+      "Overheard uses Plausible Analytics, a privacy-friendly, cookie-free analytics service. No personal data is collected, no cookies are set, and all data is aggregated. Plausible is compliant with GDPR, CCPA, and PECR.",
   },
   {
     label: "05",
@@ -40,13 +40,13 @@ const sections = [
     label: "06",
     title: "Your Rights",
     content:
-      "You can request deletion of your email address at any time by contacting the email below. Since Scout Daily does not collect any other personal data, there is nothing else to delete, export, or correct.",
+      "You can request deletion of your email address at any time by contacting the email below. Since Overheard does not collect any other personal data, there is nothing else to delete, export, or correct.",
   },
   {
     label: "07",
     title: "Contact",
     content:
-      "For privacy-related questions or to request email deletion, contact leonardo@scoutdaily.com.",
+      "For privacy-related questions or to request email deletion, contact leonardo@pdt.digital.",
   },
 ];
 
