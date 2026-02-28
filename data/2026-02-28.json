@@ -1,0 +1,86 @@
+{
+  "date": "2026-02-28",
+  "generated_at": "2026-02-28T08:33:05.168Z",
+  "cards": [
+    {
+      "id": "2026-02-28-your-ai-code-assistant-just-deleted-your-project-the-undo-bu",
+      "date": "2026-02-28",
+      "title": "Your AI Code Assistant Just Deleted Your Project? The 'Undo' Button Nobody's Building Yet.",
+      "category": "ai-tools",
+      "thesis": "AI coding tools and agents are incredibly powerful, but builders are hitting a wall when these tools make costly mistakes, like accidentally deleting or overwriting hours of uncommitted work. Traditional version control (like Git) can't help with these in-progress changes, creating a huge need for better safety nets and granular, always-on versioning that integrates directly into AI-assisted workflows. People aren't just looking for AI to build new apps; they want it to make their existing tools safer and more reliable.",
+      "signal_strength": 8,
+      "evidence": [
+        {
+          "text": "I built 'unfucked' after an AI agent overwrote hours of my hand-edits across files because I pasted a prompt into the wrong terminal. Git couldn't help because I hadn't committed my work. I wanted something that recorded every save automatically so I could rewind to any point in time.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47189650",
+          "engagement": 142
+        },
+        {
+          "text": "Claude Code deleted my research files, admitting 'I accidentally rm -rf'd real directories'. My backup hadn't run, so I built 'claude-file-recovery,' a tool to extract files from my AI session history.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47181211",
+          "engagement": 109
+        },
+        {
+          "text": "I don't need AI to build me a new app. I need it to make Jira bearable. I used a Claude Chrome extension to inject an AI-powered panel that shows cross-project dependency graphs right inside Jira.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47172238",
+          "engagement": 38
+        },
+        {
+          "text": "OpenAI raised $110B, valuing the company at $730B pre-money.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47182387",
+          "engagement": 995
+        }
+      ],
+      "opportunity": "AI coding tools are amazing, until they accidentally nuke your work and Git can't save you. Everyone's getting burned by AI agents accidentally trashing their uncommitted work, and the real opportunity is a universal 'undo' button for AI-assisted coding. Think a local-first version control that catches *every* change, even uncommitted ones, and lets you rewind instantly within tools like Cursor or Replit. Ship a VS Code extension that hooks into file system events and offers granular rollback of AI-generated edits, and you'll own the 'AI safety net' for builders.",
+      "sources": [
+        "hackernews"
+      ],
+      "signal_count": 62
+    },
+    {
+      "id": "2026-02-28-ai-agents-are-a-mess-how-to-make-money-cleaning-up-developer",
+      "date": "2026-02-28",
+      "title": "AI Agents Are a Mess: How to Make Money Cleaning Up Developer Chaos",
+      "category": "ai-tools",
+      "thesis": "Builders are diving headfirst into AI agents (like those from Claude Code, Cursor, or Windsurf), but they're quickly hitting a wall with chaos, high costs, and inconsistent results. Everyone's building agents, but the tools to manage their complexity, optimize their performance, and ensure their quality are still super early.",
+      "signal_strength": 8,
+      "evidence": [
+        {
+          "text": "When you're working with AI agents, you end up in a weird situation: you have tasks scattered across your head, Slack, email, and the CLI. No tool existed for this workflow, so I built one.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47181208",
+          "engagement": 56
+        },
+        {
+          "text": "I got tired of watching AI agents burn tokens (use up expensive processing power), take forever, and still get it wrong. My tool, pandō, helps them work 10-100x faster and more accurately.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47181753",
+          "engagement": 16
+        },
+        {
+          "text": "Deploying AI agents to production is still unnecessarily painful. If you've built something with CrewAI, LangGraph, or similar frameworks, you know the drill: it works great locally, then you spend days figuring out infrastructure, scaling, monitoring, and artifact management.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47165602",
+          "engagement": 11
+        },
+        {
+          "text": "I built Librarian, an open-source tool that stops AI agents from burning tokens (expensive processing units) by blindly re-reading their entire conversation history, cutting costs by up to 85%.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47164079",
+          "engagement": 15
+        }
+      ],
+      "opportunity": "Builders are pouring into AI agent frameworks like CrewAI and LangGraph, but they're constantly fighting token costs and unreliable outputs. While some tools manage tasks or deployments, there's a massive gap for a simple 'agent health report' that plugs directly into these frameworks. You could build a tool that analyzes an agent's run, flags wasteful steps or excessive token use, and suggests concrete optimizations, becoming the go-to for anyone trying to ship reliable, cost-effective AI agents this weekend.",
+      "sources": [
+        "hackernews",
+        "github",
+        "producthunt"
+      ],
+      "signal_count": 57
+    }
+  ]
+}
