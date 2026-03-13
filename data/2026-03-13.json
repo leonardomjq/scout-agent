@@ -1,0 +1,51 @@
+{
+  "date": "2026-03-13",
+  "generated_at": "2026-03-13T08:43:22.552Z",
+  "cards": [
+    {
+      "id": "2026-03-13-ai-agents-are-going-rogue-here-s-how-to-build-their-leash",
+      "date": "2026-03-13",
+      "title": "AI Agents Are Going Rogue – Here's How to Build Their Leash",
+      "category": "ai-tools",
+      "thesis": "AI agents (automated programs that act on your behalf) are getting powerful, but they're also a massive security risk, especially when given access to sensitive API keys (digital passwords). Builders are also finding the process of working with these agents clunky and slow, leading to a 'broken rhythm' in development. This creates a huge opportunity for tools that make agents safer and smoother to integrate into workflows, especially as concerns about 'document poisoning' in RAG systems (AI systems that pull info from external documents) also rise.",
+      "signal_strength": 9,
+      "evidence": [
+        {
+          "text": "We built OneCLI because AI agents are being given raw API keys. And it's going about as well as you'd expect. We figured the answer isn't 'don't give agents access,' it's 'give them access without giving them secrets.'",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47350424",
+          "engagement": 185
+        },
+        {
+          "text": "How attackers corrupt AI's sources (document poisoning in RAG systems).",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47349806",
+          "engagement": 158
+        },
+        {
+          "text": "I am now using agentic coding quite a lot. The honeymoon is finishing and I am starting to dislike some facets of it. I think the main setback is the rythm (waiting 10 to 30 seconds until the next question).",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47349334",
+          "engagement": 19
+        },
+        {
+          "text": "Malus – Clean Room as a Service: a secure, isolated environment for processing sensitive data.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47353558",
+          "engagement": 1682
+        },
+        {
+          "text": "Are LLM merge rates not getting better? Many SWE-bench-Passing PRs would not be merged.",
+          "source": "hackernews",
+          "url": "https://news.ycombinator.com/item?id=47350407",
+          "engagement": 277
+        }
+      ],
+      "opportunity": "People are wrestling with AI agents that have too much power and a clunky workflow. Instead of just vaults for API keys, build a 'permission layer' that lets you define *exactly* what an agent can do (e.g., 'only call this one API endpoint with these parameters') and provides a smooth, real-time interface to approve or deny agent actions when they go off-script. The first person to ship a visual editor for agent permissions and an 'action stream' where you can quickly approve/deny agent steps owns the frustrated developer market, and you could build a V1 with a proxy server and a simple UI this weekend.",
+      "sources": [
+        "hackernews"
+      ],
+      "signal_count": 132
+    }
+  ]
+}
